@@ -1,6 +1,6 @@
 import {
 	Uniform
-} from '../../../src/Three';
+} from '../../../build/Three';
 
 export const VolumeRenderShader1: {
 	uniforms: {

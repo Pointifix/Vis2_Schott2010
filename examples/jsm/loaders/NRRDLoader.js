@@ -40,6 +40,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		// this parser is largely inspired from the XTK NRRD parser : https://github.com/xtk/X
 
+
 		var _data = data;
 
 		var _dataPointer = 0;
@@ -62,6 +63,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			var _array_type = Uint8Array;
 
 			switch ( type ) {
+
 
 				// 1 byte data types
 				case 'uchar':
@@ -146,6 +148,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			return array;
 
 		}
+
 
 		//parse the header
 		function parseHeader( header ) {
@@ -276,7 +279,9 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var _header = null;
 		var _data_start = 0;
 		var i;
+
 		for ( i = 1; i < _length; i ++ ) {
+
 
 			if ( _bytes[ i - 1 ] == 10 && _bytes[ i ] == 10 ) {
 
@@ -290,10 +295,12 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			}
 
 		}
+
 		// parse the header
 		parseHeader( _header );
 
 		var _data = _bytes.subarray( _data_start ); // the data without header
+
 		if ( headerObject.encoding === 'gzip' || headerObject.encoding === 'gz' ) {
 
 			// we need to decompress the datastream
@@ -389,6 +396,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				0, 0, 0, 1 );
 
 		}
+
 
 		volume.inverseMatrix = new Matrix4();
 		volume.inverseMatrix.getInverse( volume.matrix );

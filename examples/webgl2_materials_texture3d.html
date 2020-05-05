@@ -28,6 +28,8 @@
 
 		}
 
+		var renderTextures = [ 'aneurism', 'teapot', 'skull'];
+
 		var renderer,
 			scene,
 			camera,
@@ -80,6 +82,14 @@
 			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
 
 			// Load the data ...
+
+
+
+			renderTextures = [ 'aneurism', 'teapot', 'skull' ];
+			renderTextures[ 'aneurism' ] = THREE.ImageUtils.loadTexture( 'models/aneurism.raw.png' );
+			renderTextures[ 'teapot' ] = THREE.ImageUtils.loadTexture( 'models/teapot.raw.png' );
+			renderTextures[ 'skull' ] = THREE.ImageUtils.loadTexture( 'models/skull.raw.png' );
+
 			new NRRDLoader().load( "models/nrrd/stent.nrrd", function ( volume ) {
 
 				// Texture to hold the volume. We have scalars, so we put our data in the red channel.
@@ -91,6 +101,9 @@
 				texture.type = THREE.FloatType;
 				texture.minFilter = texture.magFilter = THREE.LinearFilter;
 				texture.unpackAlignment = 1;
+
+
+
 
 				// Colormap textures
 				cmtextures = {
@@ -124,6 +137,7 @@
 				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
+				console.log( "DECOMPRESS" );
 				render();
 
 			} );

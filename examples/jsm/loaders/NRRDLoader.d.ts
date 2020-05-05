@@ -1,6 +1,6 @@
 import {
 	LoadingManager
-} from '../../../src/Three';
+} from '../../../build/Three';
 
 import {
 	Volume
