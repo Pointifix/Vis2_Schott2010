@@ -22111,6 +22111,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else if ( texture.isDataTexture3D ) {
 
+		//	console.log( "three.module.js: glFormat: " + glFormat + " glType: " + glType );
 			state.texImage3D( 32879, 0, glInternalFormat, image.width, image.height, image.depth, 0, glFormat, glType, image.data );
 			textureProperties.__maxMipLevel = 0;
 

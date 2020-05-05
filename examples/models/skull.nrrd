@@ -1,1 +1,0 @@
-NRRD0004# This is an NRRD file: http://teem.sourceforge.net/nrrd/format.html# This data is a sample from the Python imageio library, and is in the public domain.type: floatdimension: 3sizes: 256 256 256data file: ./skull_256x256x256.rawencoding: raw
