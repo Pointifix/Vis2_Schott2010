@@ -28,7 +28,7 @@
 
 		}
 
-		var renderTextures = [ 'aneurism', 'teapot', 'skull' ];
+		var renderTextures = [ 'stent', 'leg', 'head'];
 
 		var renderer,
 			scene,
@@ -36,7 +36,7 @@
 			controls,
 			material,
 			volconfig,
-			cmtextures;
+			cmtextures, mesh, actualVol;
 
 		init();
 
@@ -73,11 +73,13 @@
 			// var dirLight = new DirectionalLight( 0xffffff );
 
 			// The gui for interaction
-			volconfig = { volume: 'aneurism', clim1: 0, clim2: 1, renderstyle: 'iso', isothreshold: 0.15, colormap: 'gray' };
+			volconfig = { volume: 'stent', clim1: 0, clim2: 1, renderstyle: 'iso', isothreshold: 0.15, colormap: 'gray' };
+			actualVol = "stent";
 			var gui = new GUI();
 
 
-			gui.add( volconfig, 'volume', { aneurism: 'aneurism', leg: 'leg' } ).onChange( updateUniforms );
+			gui.add( volconfig, 'volume', renderTextures // { aneurism: 'aneurism', leg: 'leg' }
+			).onChange( updateUniforms );
 			gui.add( volconfig, 'clim1', 0, 1, 0.01 ).onChange( updateUniforms );
 			gui.add( volconfig, 'clim2', 0, 1, 0.01 ).onChange( updateUniforms );
 			gui.add( volconfig, 'colormap', { gray: 'gray', viridis: 'viridis' } ).onChange( updateUniforms );
@@ -85,15 +87,22 @@
 			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
 
 			// Load the data ...
+			loadNRRDFile( "models/nrrd/stent.nrrd", "stent");
 
 
 
-			/*renderTextures = [ 'aneurism', 'teapot', 'skull' ];
-			renderTextures[ 'aneurism' ] = THREE.ImageUtils.loadTexture( 'models/aneurism.raw.png' );
-			renderTextures[ 'teapot' ] = THREE.ImageUtils.loadTexture( 'models/teapot.raw.png' );
-			renderTextures[ 'skull' ] = THREE.ImageUtils.loadTexture( 'models/skull.raw.png' );
-*/
-			new NRRDLoader().load( "models/leg.nrrd", function ( volume ) {
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+
+
+		function loadNRRDFile( filePath, file ){
+			if(mesh != null) {
+				scene.remove( mesh );
+			}
+			new NRRDLoader().load( filePath, function ( volume ) {
 
 
 				// Texture to hold the volume. We have scalars, so we put our data in the red channel.
@@ -101,9 +110,19 @@
 				// Also see https://www.khronos.org/registry/webgl/specs/latest/2.0/#TEXTURE_TYPES_FORMATS_FROM_DOM_ELEMENTS_TABLE
 				// TODO: look the dtype up in the volume metadata
 				var texture = new THREE.DataTexture3D( volume.data, volume.xLength, volume.yLength, volume.zLength );
-				texture.format = THREE.RedFormat;
-				//texture.type = THREE.FloatType;
-				//texture.type = THREE.UnsignedInt248Type;
+
+				if(file == "stent"){
+					texture.format = THREE.RedFormat;
+					texture.type = THREE.FloatType;
+				}else
+				if(file == "head"){
+					texture.type = THREE.FloatType;
+					texture.format = THREE.RedFormat;
+				}else
+				if(file == "leg"){
+					texture.format = THREE.RedFormat;
+				}
+
 				texture.minFilter = texture.magFilter = THREE.LinearFilter;
 				texture.unpackAlignment = 1;
 
@@ -139,19 +158,34 @@
 				var geometry = new THREE.BoxBufferGeometry( volume.xLength, volume.yLength, volume.zLength );
 				geometry.translate( volume.xLength / 2 - 0.5, volume.yLength / 2 - 0.5, volume.zLength / 2 - 0.5 );
 
-				var mesh = new THREE.Mesh( geometry, material );
+
+				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
-				console.log( "DECOMPRESS" );
 				render();
 
 			} );
 
-			window.addEventListener( 'resize', onWindowResize, false );
-
 		}
-
 		function updateUniforms() {
+			if(actualVol != volconfig.volume) {
+				actualVol = volconfig.volume;
+				switch (volconfig.volume) {
+					case "leg":
+						loadNRRDFile( "models/leg2.nrrd", "leg" );
+						break;
+					case "stent":
+						loadNRRDFile( "models/nrrd/stent.nrrd", "stent" );
+						break;
+					case "head":
+						loadNRRDFile( "models/nrrd/CTbrain50.nrrd", "head" );
+						break;
+					default:
+						loadNRRDFile( "models/nrrd/stent.nrrd", "stent" );
+				}
+
+			}
+
 
 			material.uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
 			material.uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
@@ -161,6 +195,8 @@
 			render();
 
 		}
+
+
 
 		function onWindowResize() {
 
