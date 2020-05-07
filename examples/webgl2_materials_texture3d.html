@@ -28,7 +28,7 @@
 
 		}
 
-		var renderTextures = [ 'stent', 'leg', 'head'];
+		var renderTextures = [ 'stent', 'teapot', 'skull', 'aneurism'];
 
 		var renderer,
 			scene,
@@ -73,18 +73,20 @@
 			// var dirLight = new DirectionalLight( 0xffffff );
 
 			// The gui for interaction
-			volconfig = { volume: 'stent', clim1: 0, clim2: 1, renderstyle: 'iso', isothreshold: 0.15, colormap: 'gray' };
+			volconfig = { volume: 'stent', 'Focus Plane Position': 1, 'Confusion Rate': 1, clim1: 0, clim2: 1, renderstyle: 'iso', isothreshold: 0.15, colormap: 'gray' };
 			actualVol = "stent";
 			var gui = new GUI();
 
 
 			gui.add( volconfig, 'volume', renderTextures // { aneurism: 'aneurism', leg: 'leg' }
 			).onChange( updateUniforms );
+			gui.add( volconfig, 'Focus Plane Position', 0, 1, 0.01 ).onChange( updateUniforms );
+			gui.add( volconfig, 'Confusion Rate', 0, 1, 0.01 ).onChange( updateUniforms );
+			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
 			gui.add( volconfig, 'clim1', 0, 1, 0.01 ).onChange( updateUniforms );
 			gui.add( volconfig, 'clim2', 0, 1, 0.01 ).onChange( updateUniforms );
 			gui.add( volconfig, 'colormap', { gray: 'gray', viridis: 'viridis' } ).onChange( updateUniforms );
 			gui.add( volconfig, 'renderstyle', { mip: 'mip', iso: 'iso' } ).onChange( updateUniforms );
-			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
 
 			// Load the data ...
 			loadNRRDFile( "models/nrrd/stent.nrrd", "stent");
@@ -115,13 +117,13 @@
 					texture.format = THREE.RedFormat;
 					texture.type = THREE.FloatType;
 				}else
-				if(file == "head"){
+				{
+					texture.format = THREE.RedFormat;
+				}/*else
+				//if(file == "head"){
 					texture.type = THREE.FloatType;
 					texture.format = THREE.RedFormat;
-				}else
-				if(file == "leg"){
-					texture.format = THREE.RedFormat;
-				}
+				}*/
 
 				texture.minFilter = texture.magFilter = THREE.LinearFilter;
 				texture.unpackAlignment = 1;
@@ -171,14 +173,17 @@
 			if(actualVol != volconfig.volume) {
 				actualVol = volconfig.volume;
 				switch (volconfig.volume) {
-					case "leg":
-						loadNRRDFile( "models/leg2.nrrd", "leg" );
+					case "teapot":
+						loadNRRDFile( "models/nrrd/teapot.nrrd", "teapot" );
+						break;
+					case "skull":
+						loadNRRDFile( "models/nrrd/skull.nrrd", "skull" );
 						break;
 					case "stent":
 						loadNRRDFile( "models/nrrd/stent.nrrd", "stent" );
 						break;
-					case "head":
-						loadNRRDFile( "models/nrrd/CTbrain50.nrrd", "head" );
+					case "aneurism":
+						loadNRRDFile( "models/nrrd/aneurism.nrrd", "aneurism" );
 						break;
 					default:
 						loadNRRDFile( "models/nrrd/stent.nrrd", "stent" );
