@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js webgl - volume rendering example</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+</head>
+
+<body>
+	<div id="info">
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Float volume render test (mip / isosurface)
+	</div>
+	<div id="inset"></div>
+	<!--<script src="./jsm/shaders/VertCostum.glsl" id="vertCostum"></script>-->
+
+	<!-- https://webglfundamentals.org/webgl/lessons/webgl-fundamentals.html -->
+	<script  id="vertexShader" type="x-shader/x-vertex">
+		void main() {
+		gl_Position = projectionMatrix * modelViewMatrix * vec4(position.x+10.0, position.y, position.z+5.0, 1.0);
+	}
+	</script>
+
+	<script id="fragmentShader" type="x-shader/x-fragment">
+		void main() {
+			gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);
+		}
+	</script>
+
+
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
+
+		var WIDTH = window.innerWidth;
+		var HEIGHT = window.innerHeight;
+
+		var renderer = new THREE.WebGLRenderer({antialias:true});
+		renderer.setSize(WIDTH, HEIGHT);
+		renderer.setClearColor(0xDDDDDD, 1);
+		document.body.appendChild(renderer.domElement);
+
+		var scene = new THREE.Scene();
+
+		var camera = new THREE.PerspectiveCamera(70, WIDTH/HEIGHT);
+		camera.position.z = 50;
+		scene.add(camera);
+
+		var boxGeometry = new THREE.BoxGeometry(10, 10, 10);
+
+
+		var shaderMaterial = new THREE.ShaderMaterial( {
+			vertexShader: document.getElementById( 'vertexShader' ).textContent,
+			fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+		});
+
+		var cube = new THREE.Mesh(boxGeometry, shaderMaterial);
+
+
+		var helper = new THREE.BoundingBoxHelper(cube, 0xff0000);
+		helper.update();
+		// If you want a visible bounding box
+		scene.add(helper);
+
+		//cube.rotation.set(0.4, 0.2, 0);
+
+		function render() {
+			requestAnimationFrame(render);
+			renderer.render(scene, camera);
+		}
+		render();
+
+	</script>
+
+</body>
+</html>

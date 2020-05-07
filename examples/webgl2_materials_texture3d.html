@@ -36,7 +36,10 @@
 			controls,
 			material,
 			volconfig,
-			cmtextures, mesh, actualVol;
+			cmtextures,
+				//Global variables for deleting the mesh if volume swaps
+				mesh, actualVol,
+				boundingBox;
 
 		init();
 
@@ -89,6 +92,8 @@
 			gui.add( volconfig, 'renderstyle', { mip: 'mip', iso: 'iso' } ).onChange( updateUniforms );
 
 			// Load the data ...
+
+
 			loadNRRDFile( "models/nrrd/stent.nrrd", "stent");
 
 
@@ -99,10 +104,14 @@
 		}
 
 
+		function createBoundingBox(){
+
+		}
 
 		function loadNRRDFile( filePath, file ){
 			if(mesh != null) {
 				scene.remove( mesh );
+				scene.remove( boundingBox )
 			}
 			new NRRDLoader().load( filePath, function ( volume ) {
 
@@ -163,6 +172,13 @@
 
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
+
+				//Create bounding box
+				boundingBox = new THREE.BoundingBoxHelper(mesh, 0xff0000);
+				boundingBox.update();
+				// If you want a visible bounding box
+				scene.add(boundingBox);
+
 
 				render();
 
