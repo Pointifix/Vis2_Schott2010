@@ -22,6 +22,7 @@
 	</script>
 
 	<script id="fragmentShader" type="x-shader/x-fragment">
+
 		void main() {
 			gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);
 		}
@@ -29,11 +30,14 @@
 
 
 	<script type="module">
+
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import * as THREE from '../build/three.module.js';
 
 		var WIDTH = window.innerWidth;
 		var HEIGHT = window.innerHeight;
 
+		var controls;
 		var renderer = new THREE.WebGLRenderer({antialias:true});
 		renderer.setSize(WIDTH, HEIGHT);
 		renderer.setClearColor(0xDDDDDD, 1);
@@ -43,7 +47,15 @@
 
 		var camera = new THREE.PerspectiveCamera(70, WIDTH/HEIGHT);
 		camera.position.z = 50;
-		scene.add(camera);
+	//	scene.add(camera);
+
+		// Create controls
+		controls = new OrbitControls( camera, renderer.domElement );
+		controls.addEventListener( 'change', render );
+			controls.target.set( 1, 1, 2 );
+            controls.minZoom = 0.5;
+            controls.maxZoom = 4;
+            controls.update();
 
 		var boxGeometry = new THREE.BoxGeometry(10, 10, 10);
 
@@ -56,12 +68,24 @@
 		var cube = new THREE.Mesh(boxGeometry, shaderMaterial);
 
 
+
+
+
 		var helper = new THREE.BoundingBoxHelper(cube, 0xff0000);
 		helper.update();
 		// If you want a visible bounding box
 		scene.add(helper);
+	//	scene.add(cube);
 
 		//cube.rotation.set(0.4, 0.2, 0);
+
+		var geometry = new THREE.PlaneGeometry( 10, 10, 10 );
+		var material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+		var plane = new THREE.Mesh( geometry, material );
+		scene.add( plane );
+
+
+
 
 		function render() {
 			requestAnimationFrame(render);
