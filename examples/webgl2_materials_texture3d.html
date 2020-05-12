@@ -20,6 +20,11 @@
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import { NRRDLoader } from './jsm/loaders/NRRDLoader.js';
 		import { VolumeRenderShader1 } from './jsm/shaders/VolumeShader.js';
+		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+		import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+		import { BokehPass } from './jsm/postprocessing/BokehPass.js';
+
+
 		import { WEBGL } from './jsm/WebGL.js';
 
 		if ( WEBGL.isWebGL2Available() === false ) {
@@ -30,40 +35,66 @@
 
 		var renderTextures = [ 'stent', 'teapot', 'skull', 'aneurism'];
 
+		//True: Show the focal plane
+		//False: Hide focal plane
+		var debugMode = true;
+
+		var postprocessing = {};
+
 		var renderer,
 			scene,
 			camera,
 			controls,
 			material,
 			volconfig,
-			cmtextures,
-				//Global variables for deleting the mesh if volume swaps
-				mesh, actualVol, focalPlane,focplaneposGUI,
-				boundingBox;
+			cmtextures, mesh, actualVol, focalPlane, focplaneposGUI, boundingBox;
 
 		init();
 
 		function init() {
 
+
+
 			scene = new THREE.Scene();
 
 			// Create renderer
 			var canvas = document.createElement( 'canvas' );
-			var context = canvas.getContext( 'webgl2', { alpha: false, antialias: false } );
+			var context = canvas.getContext( 'webgl2', { alpha: true, antialias: false } );
 			renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );
 
-			context.disable(context.CULL_FACE);
+			//context.disable(context.CULL_FACE);
 			//context.disable(context.DEPTH_TEST);
 
 			// Create camera (The volume renderer does not work very well with perspective yet)
 			var h = 512; // frustum height
 			var aspect = window.innerWidth / window.innerHeight;
 			camera = new THREE.OrthographicCamera( - h * aspect / 2, h * aspect / 2, h / 2, - h / 2, 1, 1000 );
-			camera.position.set( 0, 64, 128 );
+			camera.position.set( 0, 64, 300 );
 			camera.up.set( 0, 0, 1 ); // In our data, z is up
+
+
+			//TODO: Perspektivische Kamera für slice blurring?
+			//camera = new THREE.PerspectiveCamera( 70,  window.innerWidth  / window.innerHeight, 1, 3000 );
+			//camera.position.z = 300;
+
+
+
+
+			var matChanger = function ( ) {
+
+				postprocessing.bokeh.uniforms[ "focus" ].value = 10;
+				postprocessing.bokeh.uniforms[ "aperture" ].value = 10 * 0.00001;
+				postprocessing.bokeh.uniforms[ "maxblur" ].value = 5;
+
+			};
+
+
+
+			initPostprocessing();
+			matChanger();
 
 			// Create controls
 			controls = new OrbitControls( camera, renderer.domElement );
@@ -73,16 +104,12 @@
 			controls.maxZoom = 4;
 			controls.update();
 
-			// scene.add( new AxesHelper( 128 ) );
 
-			// Lighting is baked into the shader a.t.m.
-			// var dirLight = new DirectionalLight( 0xffffff );
 
 			// The gui for interaction
 			volconfig = { volume: 'stent', focplanepos: 64, 'Confusion Rate': 1, clim1: 0, clim2: 1, renderstyle: 'iso', isothreshold: 0.15, colormap: 'gray' };
 			actualVol = "stent";
 			var gui = new GUI();
-
 
 
 			gui.add( volconfig, 'volume', renderTextures // { aneurism: 'aneurism', leg: 'leg' }
@@ -96,10 +123,7 @@
 			gui.add( volconfig, 'renderstyle', { mip: 'mip', iso: 'iso' } ).onChange( updateUniforms );
 
 			// Load the data ...
-
-
 			loadNRRDFile( "models/nrrd/stent.nrrd", "stent");
-
 
 
 			window.addEventListener( 'resize', onWindowResize, false );
@@ -107,34 +131,11 @@
 		}
 
 
-		function createFocalPlane(x,y,z){
-			var geometry = new THREE.PlaneGeometry( x,z,y );
 
-		//	geometry.translate(0, y/2, z/2);
-
-			//geometry.translate( x / 2 - 0.5,y / 2 - 0.5, z / 2 - 0.5 );
-			var material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
-			focalPlane = new THREE.Mesh( geometry, material );
-			focalPlane.rotateX(Math.PI/2);
-			focalPlane.rotateY(Math.PI/2);
-			focalPlane.translateZ(y/2);
-			focalPlane.translateX(x/2);;
-			focalPlane.translateY(z/2);
-
-
-			var material2 = new THREE.MeshBasicMaterial( {color: 0xff0100, side: THREE.DoubleSide} );
-			var secPlane = new THREE.Mesh( geometry, material2 );
-			secPlane.rotateX(Math.PI/2);
-			secPlane.position.set(focalPlane.position.x,y -20,focalPlane.position.z);
-
-			console.log(focalPlane.position);
-			///focalPlane.translateOnAxis( x / 2 - 0.5,y / 2 - 0.5, z / 2 - 0.5 );
-			//focalPlane.translateX(-1, (1,1,1) );
-
-			scene.add( focalPlane );
-			//scene.add( secPlane );
-		}
-
+		/* Author: David
+		*  Load NRRD-File and create Bounding-Box
+		*  If we have a new mesh, remove the old one
+		*/
 		function loadNRRDFile( filePath, file ){
 			if(mesh != null) {
 				scene.remove( mesh );
@@ -143,8 +144,7 @@
 			}
 			new NRRDLoader().load( filePath, function ( volume ) {
 
-				//Visual presentation of focal plane
-				createFocalPlane(volume.xLength, volume.yLength, volume.zLength );
+
 
 				// Texture to hold the volume. We have scalars, so we put our data in the red channel.
 				// THREEJS will select R32F (33326) based on the THREE.RedFormat and THREE.FloatType.
@@ -158,11 +158,7 @@
 				}else
 				{
 					texture.format = THREE.RedFormat;
-				}/*else
-				//if(file == "head"){
-					texture.type = THREE.FloatType;
-					texture.format = THREE.RedFormat;
-				}*/
+				}
 
 				texture.minFilter = texture.magFilter = THREE.LinearFilter;
 				texture.unpackAlignment = 1;
@@ -213,15 +209,25 @@
 				scene.add(boundingBox);
 
 
+				//Visual presentation of focal plane
+				createFocalPlane( volume.xLength, volume.yLength, volume.zLength );
+				//Visual presentation of slices
+				createSlices( volume.xLength, volume.yLength, volume.zLength );
+
 
 				//Update gui for the focal plane
 				focplaneposGUI = focplaneposGUI.min(1).max(volume.xLength).setValue(volume.xLength/2);
 				volconfig.focplanepos = volume.xLength/2;
+
 				render();
 
 			} );
 
 		}
+
+		/* Author: David
+		* Update if a input-value changed
+		*/
 		function updateUniforms() {
 			if(actualVol != volconfig.volume) {
 				actualVol = volconfig.volume;
@@ -254,6 +260,8 @@
 			focalPlane.position.set(volconfig.focplanepos,focalPlane.position.y,focalPlane.position.z);
 
 
+			postprocessing.bokeh.uniforms[ "focus" ].value = volconfig.focplanepos;
+
 
 			render();
 
@@ -264,7 +272,7 @@
 		function onWindowResize() {
 
 			renderer.setSize( window.innerWidth, window.innerHeight );
-
+			postprocessing.composer.setSize( window.innerWidth, window.innerHeight );
 			var aspect = window.innerWidth / window.innerHeight;
 
 			var frustumHeight = camera.top - camera.bottom;
@@ -278,10 +286,102 @@
 
 		}
 
+		/* Author: WEGBL_postprocessing_dof
+		* Initialize Bluring-Pass
+		*/
+		function initPostprocessing() {
+
+
+
+			var renderPass = new RenderPass( scene, camera );
+
+			var bokehPass = new BokehPass( scene, camera, {
+				focus: 1.0,
+				aperture:	0.025,
+				maxblur:	1.0,
+
+				width: window.innerWidth,
+				height: window.innerHeight
+			} );
+
+			var composer = new EffectComposer( renderer );
+
+			composer.addPass( renderPass );
+			composer.addPass( bokehPass );
+
+			postprocessing.composer = composer;
+			postprocessing.bokeh = bokehPass;
+
+		}
+
 		function render() {
 			//glClear(GL_DEPTH_BUFFER_BIT);
 			renderer.clear(renderer.DEPTH_BUFFER_BIT);
 			renderer.render( scene, camera );
+			postprocessing.composer.render( 0.1 );
+
+		}
+
+
+		/* Author: David
+   		 *  For DEBUGGING: Visualization of focal plane
+    	*/
+		function createFocalPlane(x,y,z){
+			var geometry = new THREE.PlaneGeometry( x,z,y );
+			var opacity;
+
+			if(debugMode == true){
+				opacity = 0.5;
+			}else{
+				opacity = 0.0;
+			}
+			var mat = new THREE.MeshBasicMaterial( {color: 0xffff00, opacity: opacity, transparent: true, side: THREE.DoubleSide} );
+
+
+			focalPlane = new THREE.Mesh( geometry, mat );
+			focalPlane.rotateX(Math.PI/2);
+			focalPlane.rotateY(Math.PI/2);
+			focalPlane.translateZ(y/2);
+			focalPlane.translateX(x/2);;
+			focalPlane.translateY(z/2);
+
+			scene.add( focalPlane );
+		}
+
+		/* Author: David
+		*  Visualization for the slices
+		 */
+		function createSlices(x,y,z){
+
+			/*if(debugMode == true) {
+				var geometry = new THREE.PlaneGeometry( x, z, y );
+				var material = new THREE.MeshBasicMaterial( {
+					color: 0x1ffff1,
+					opacity: 1.0,
+					transparent: true,
+					side: THREE.DoubleSide
+				} );
+
+				var i;
+				var distanceSlices = 10;
+				var numberSlices = y / distanceSlices;
+
+				console.log( y );
+				for (i = 0; i < numberSlices; i ++) {
+					var slices = new THREE.Mesh( geometry, material );
+					slices.rotateX( Math.PI / 2 );
+					slices.rotateY( Math.PI / 2 );
+					slices.translateX( x / 2 );
+					slices.translateY( z / 2 );
+					slices.translateZ( i * distanceSlices );
+
+					scene.add( slices );
+
+
+					console.log( y );
+
+				}
+			}*/
 
 		}
 
