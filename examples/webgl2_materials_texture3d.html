@@ -28,9 +28,7 @@
 		import { WEBGL } from './jsm/WebGL.js';
 
 		if ( WEBGL.isWebGL2Available() === false ) {
-
 			document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
-
 		}
 
 		var renderTextures = [ 'stent', 'teapot', 'skull', 'aneurism'];
@@ -208,6 +206,8 @@
 				// If you want a visible bounding box
 				scene.add(boundingBox);
 
+				//Visual presentation of focal plane
+				createFocalPlane(volume.xLength, volume.yLength, volume.zLength );
 
 				//Visual presentation of focal plane
 				createFocalPlane( volume.xLength, volume.yLength, volume.zLength );
