@@ -23,7 +23,8 @@
 		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 		import { RenderPass } from './jsm/postprocessing/RenderPass.js';
 		import { BokehPass } from './jsm/postprocessing/BokehPass.js';
-
+		import { ProxyGeometry } from './jsm/ProxyGeometry.js';
+		import {  } from '../build/slice.js';
 
 		import { WEBGL } from './jsm/WebGL.js';
 
@@ -31,11 +32,13 @@
 			document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
 		}
 
+
+
 		var renderTextures = [ 'stent', 'teapot', 'skull', 'aneurism'];
 
 		//True: Show the focal plane
 		//False: Hide focal plane
-		var debugMode = true;
+		var debugMode = false;
 
 		var postprocessing = {};
 
@@ -45,15 +48,16 @@
 			controls,
 			material,
 			volconfig,
-			cmtextures, mesh, actualVol, focalPlane, focplaneposGUI, boundingBox;
+			cmtextures, mesh, actualVol, focalPlane, focplaneposGUI, boundingBox, volumeMesh;
 
 		init();
 
 		function init() {
-
-
-
 			scene = new THREE.Scene();
+
+
+
+
 
 			// Create renderer
 			var canvas = document.createElement( 'canvas' );
@@ -73,10 +77,10 @@
 			camera.position.set( 0, 64, 300 );
 			camera.up.set( 0, 0, 1 ); // In our data, z is up
 
-
 			//TODO: Perspektivische Kamera für slice blurring?
 			//camera = new THREE.PerspectiveCamera( 70,  window.innerWidth  / window.innerHeight, 1, 3000 );
 			//camera.position.z = 300;
+
 
 
 
@@ -193,32 +197,28 @@
 				var geometry = new THREE.BoxBufferGeometry( volume.xLength, volume.yLength, volume.zLength );
 				geometry.translate( volume.xLength / 2 - 0.5, volume.yLength / 2 - 0.5, volume.zLength / 2 - 0.5 );
 
-
-
-
 				mesh = new THREE.Mesh( geometry, material );
 
-				scene.add( mesh );
+				//scene.add( mesh );
 
 				//Create bounding box
-				boundingBox = new THREE.BoundingBoxHelper(mesh, 0xff0000);
+				boundingBox = new THREE.BoxHelper(mesh, 0xff0000);
 				boundingBox.update();
 				// If you want a visible bounding box
 				scene.add(boundingBox);
 
 				//Visual presentation of focal plane
 				createFocalPlane(volume.xLength, volume.yLength, volume.zLength );
-
-				//Visual presentation of focal plane
-				createFocalPlane( volume.xLength, volume.yLength, volume.zLength );
 				//Visual presentation of slices
-				createSlices( volume.xLength, volume.yLength, volume.zLength );
+				//createSlices( volume.xLength, volume.yLength, volume.zLength );
 
 
 				//Update gui for the focal plane
 				focplaneposGUI = focplaneposGUI.min(1).max(volume.xLength).setValue(volume.xLength/2);
 				volconfig.focplanepos = volume.xLength/2;
+				volumeMesh = volume;
 
+			//	Object.assign(volumeMesh, volume);
 				render();
 
 			} );
@@ -315,10 +315,38 @@
 		}
 
 		function render() {
+
+
+			var points = [];
+			var materialProxy = new THREE.PointsMaterial({
+				color: 0x1ffff1
+			});
+
+			if(volumeMesh != null) {
+				let proxyGeometries = new ProxyGeometry();
+
+			//	console.log(volumeMesh);
+
+				var proxGeos = proxyGeometries.getProxyGeometry(camera, 15, 1, volumeMesh.xLength, volumeMesh);
+
+				proxGeos.forEach(element => {
+					var point = new THREE.Points(element, materialProxy);
+					scene.add(point);
+					points.push(point);
+				});
+
+
+			}
 			//glClear(GL_DEPTH_BUFFER_BIT);
 			renderer.clear(renderer.DEPTH_BUFFER_BIT);
 			renderer.render( scene, camera );
-			postprocessing.composer.render( 0.1 );
+
+			points.forEach(element => {
+				scene.remove(element);
+			});
+
+			//TODO: Blurring activate
+			//postprocessing.composer.render( 0.1 );
 
 		}
 
@@ -353,7 +381,7 @@
 		 */
 		function createSlices(x,y,z){
 
-			/*if(debugMode == true) {
+			if(debugMode == true) {
 				var geometry = new THREE.PlaneGeometry( x, z, y );
 				var material = new THREE.MeshBasicMaterial( {
 					color: 0x1ffff1,
@@ -365,6 +393,8 @@
 				var i;
 				var distanceSlices = 10;
 				var numberSlices = y / distanceSlices;
+
+
 
 				console.log( y );
 				for (i = 0; i < numberSlices; i ++) {
@@ -381,7 +411,7 @@
 					console.log( y );
 
 				}
-			}*/
+			}
 
 		}
 

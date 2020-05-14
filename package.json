@@ -105,5 +105,8 @@
       "build/three.module.js"
     ],
     "directories": {}
+  },
+  "dependencies": {
+    "threejs-slice-geometry": "^0.2.2"
   }
 }
