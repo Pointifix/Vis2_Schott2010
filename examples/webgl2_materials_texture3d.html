@@ -1,421 +1,281 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>three.js webgl - volume rendering example</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<link type="text/css" rel="stylesheet" href="main.css">
+    <title>three.js webgl - volume rendering example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="main.css">
 </head>
 
 <body>
-	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Float volume render test (mip / isosurface)
-	</div>
-	<div id="inset"></div>
+<div id="info">
+    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Float volume render test (mip /
+    isosurface)
+</div>
+<div id="inset"></div>
 
-	<script type="module">
-		import * as THREE from '../build/three.module.js';
+<script type="module">
+    import * as THREE from '../build/three.module.js';
+    import {GUI} from './jsm/libs/dat.gui.module.js';
+    import {OrbitControls} from './jsm/controls/OrbitControls.js';
+    import {NRRDLoader} from './jsm/loaders/NRRDLoader.js';
+    import {VolumeRenderShader1} from './jsm/shaders/VolumeShader/VolumeShader.js';
+    import {ProxyGeometry} from './jsm/ProxyGeometry.js';
 
-		import { GUI } from './jsm/libs/dat.gui.module.js';
-		import { OrbitControls } from './jsm/controls/OrbitControls.js';
-		import { NRRDLoader } from './jsm/loaders/NRRDLoader.js';
-		import { VolumeRenderShader1 } from './jsm/shaders/VolumeShader.js';
-		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-		import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-		import { BokehPass } from './jsm/postprocessing/BokehPass.js';
-		import { ProxyGeometry } from './jsm/ProxyGeometry.js';
-		import {  } from '../build/slice.js';
+    import {WEBGL} from './jsm/WebGL.js';
 
-		import { WEBGL } from './jsm/WebGL.js';
+    if (WEBGL.isWebGL2Available() === false) {
+        document.body.appendChild(WEBGL.getWebGL2ErrorMessage());
+    }
 
-		if ( WEBGL.isWebGL2Available() === false ) {
-			document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
-		}
+    //True: Show the focal plane
+    //False: Hide focal plane
+    var debugMode = false;
 
 
+    var renderer, scene, camera, controls, material, volconfig, mesh, actualVol, focalPlane, focplaneposGUI,
+        boundingBox, volumeMesh;
+    let box;
+    let proxyGeometries;
 
-		var renderTextures = [ 'stent', 'teapot', 'skull', 'aneurism'];
 
-		//True: Show the focal plane
-		//False: Hide focal plane
-		var debugMode = false;
+    var renderTextures = ['stent', 'skull', 'aneurism', 'teapot'];
 
-		var postprocessing = {};
+    init();
 
-		var renderer,
-			scene,
-			camera,
-			controls,
-			material,
-			volconfig,
-			cmtextures, mesh, actualVol, focalPlane, focplaneposGUI, boundingBox, volumeMesh;
+    function init() {
+        scene = new THREE.Scene();
 
-		init();
 
-		function init() {
-			scene = new THREE.Scene();
+        // Create renderer
+        let canvas = document.createElement('canvas');
+        let context = canvas.getContext('webgl2', {alpha: true, antialias: false});
+        renderer = new THREE.WebGLRenderer({canvas: canvas, context: context});
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
+        // Create camera (The volume renderer does not work very well with perspective yet)
+        let h = 512; // frustum height
+        let aspect = window.innerWidth / window.innerHeight;
+        /*camera = new THREE.OrthographicCamera( - h * aspect / 2, h * aspect / 2, h / 2, - h / 2, 1, 1000 );
+        camera.position.set( 0, 0, 0 );
+        camera.up.set( 0, 0, 1 ); // In our data, z is up
+        camera.updateProjectionMatrix();*/
 
+        //TODO: Perspektivische Kamera für slice blurring?
+        camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 3000);
+        camera.position.z = -300;
 
+        // Create controls
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.addEventListener('change', render);
+        controls.target.set(0, 0, 0);
+        controls.minZoom = 0.5;
+        controls.maxZoom = 4;
+        controls.update();
 
+        // The gui for interaction
+        volconfig = {volume: 'teapot', focplanepos: 64, 'Blur': 1};
+        actualVol = "stent";
+        let gui = new GUI();
 
-			// Create renderer
-			var canvas = document.createElement( 'canvas' );
-			var context = canvas.getContext( 'webgl2', { alpha: true, antialias: false } );
-			renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			document.body.appendChild( renderer.domElement );
 
-			//context.disable(context.CULL_FACE);
-			//context.disable(context.DEPTH_TEST);
+        gui.add(volconfig, 'volume', renderTextures // { aneurism: 'aneurism', leg: 'leg' }
+        ).onChange(updateGUIValues);
+        focplaneposGUI = gui.add(volconfig, 'focplanepos', 0, 200, 1).onChange(updateGUIValues);
+        gui.add(volconfig, 'Blur', 0, 1, 0.01).onChange(updateGUIValues);
+
+
+        // Load the data ...
+        loadNRRDFile("models/nrrd/stent.nrrd", "stent");
+
+
+        window.addEventListener('resize', onWindowResize, false);
+
+    }
+
+
+    /* Author: David
+    *  Load NRRD-File and create Bounding-Box
+    *  If we have a new mesh, remove the old one
+    */
+    function loadNRRDFile(filePath, file) {
+        if (mesh != null) {
+            scene.remove(mesh);
+            scene.remove(boundingBox);
+            scene.remove(focalPlane);
+        }
+        new NRRDLoader().load(filePath, function (volume) {
 
-			// Create camera (The volume renderer does not work very well with perspective yet)
-			var h = 512; // frustum height
-			var aspect = window.innerWidth / window.innerHeight;
-			camera = new THREE.OrthographicCamera( - h * aspect / 2, h * aspect / 2, h / 2, - h / 2, 1, 1000 );
-			camera.position.set( 0, 64, 300 );
-			camera.up.set( 0, 0, 1 ); // In our data, z is up
 
-			//TODO: Perspektivische Kamera für slice blurring?
-			//camera = new THREE.PerspectiveCamera( 70,  window.innerWidth  / window.innerHeight, 1, 3000 );
-			//camera.position.z = 300;
+            var texture = new THREE.DataTexture3D(volume.data, volume.xLength, volume.yLength, volume.zLength);
 
+            if (file == "stent") {
+                texture.format = THREE.RedFormat;
+                texture.type = THREE.FloatType;
+            } else {
+                texture.format = THREE.RedFormat;
+            }
 
+            texture.minFilter = texture.magFilter = THREE.LinearFilter;
+            texture.unpackAlignment = 1;
 
+            // Material
+            let shader = VolumeRenderShader1;
 
+            let uniforms = THREE.UniformsUtils.clone(shader.uniforms);
 
-			var matChanger = function ( ) {
+            uniforms["u_volume"].value = texture;
+            uniforms["u_size"].value.set(volume.xLength, volume.yLength, volume.zLength);
 
-				postprocessing.bokeh.uniforms[ "focus" ].value = 10;
-				postprocessing.bokeh.uniforms[ "aperture" ].value = 10 * 0.00001;
-				postprocessing.bokeh.uniforms[ "maxblur" ].value = 5;
+            console.log(uniforms["u_volume"].value);
 
-			};
+            material = new THREE.ShaderMaterial({
+                uniforms: uniforms,
+                vertexShader: shader.vertexShader,
+                fragmentShader: shader.fragmentShader,
+                side: THREE.DoubleSide, // The volume shader uses the backface as its "reference point"
+                opacity: 0.4,
+                transparent: true
+            });
 
+            // THREE.Mesh
+            box = new THREE.BoxBufferGeometry(volume.xLength, volume.yLength, volume.zLength);
 
+            mesh = new THREE.Mesh(box, material);
+            //scene.add(mesh);
 
-			initPostprocessing();
-			matChanger();
+            //Create bounding box
+            boundingBox = new THREE.BoxHelper(mesh, 0xffff00);
+            boundingBox.update();
+            scene.add(boundingBox);
 
-			// Create controls
-			controls = new OrbitControls( camera, renderer.domElement );
-			controls.addEventListener( 'change', render );
-			controls.target.set( 64, 64, 128 );
-			controls.minZoom = 0.5;
-			controls.maxZoom = 4;
-			controls.update();
+            //Visual presentation of focal plane
+            //createFocalPlane(volume.xLength, volume.yLength, volume.zLength );
 
+            //Update gui for the focal plane
+            focplaneposGUI = focplaneposGUI.min(1).max(volume.xLength).setValue(volume.xLength / 2);
+            volconfig.focplanepos = volume.xLength / 2;
+            volumeMesh = volume;
 
+            proxyGeometries = new ProxyGeometry(box.boundingBox);
+            render();
 
-			// The gui for interaction
-			volconfig = { volume: 'stent', focplanepos: 64, 'Confusion Rate': 1, clim1: 0, clim2: 1, renderstyle: 'iso', isothreshold: 0.15, colormap: 'gray' };
-			actualVol = "stent";
-			var gui = new GUI();
+        });
 
+    }
 
-			gui.add( volconfig, 'volume', renderTextures // { aneurism: 'aneurism', leg: 'leg' }
-			).onChange( updateUniforms );
-			focplaneposGUI = gui.add( volconfig, 'focplanepos', 0, 200, 1 ).onChange( updateUniforms );
-			gui.add( volconfig, 'Confusion Rate', 0, 1, 0.01 ).onChange( updateUniforms );
-			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
-			gui.add( volconfig, 'clim1', 0, 1, 0.01 ).onChange( updateUniforms );
-			gui.add( volconfig, 'clim2', 0, 1, 0.01 ).onChange( updateUniforms );
-			gui.add( volconfig, 'colormap', { gray: 'gray', viridis: 'viridis' } ).onChange( updateUniforms );
-			gui.add( volconfig, 'renderstyle', { mip: 'mip', iso: 'iso' } ).onChange( updateUniforms );
+    /* Author: David
+    * Update if a input-value changed
+    */
+    function updateGUIValues() {
+        if (actualVol != volconfig.volume) {
+            actualVol = volconfig.volume;
+            switch (volconfig.volume) {
+                case "teapot":
+                    loadNRRDFile("models/nrrd/teapot.nrrd", "teapot");
+                    break;
+                case "skull":
+                    loadNRRDFile("models/nrrd/skull.nrrd", "skull");
+                    break;
+                case "stent":
+                    loadNRRDFile("models/nrrd/stent.nrrd", "stent");
+                    break;
+                case "aneurism":
+                    loadNRRDFile("models/nrrd/aneurism.nrrd", "aneurism");
+                    break;
+                default:
+                    loadNRRDFile("models/nrrd/stent.nrrd", "stent");
+            }
 
-			// Load the data ...
-			loadNRRDFile( "models/nrrd/stent.nrrd", "stent");
+        }
 
+        if (focalPlane != null) {
+            focalPlane.position.set(volconfig.focplanepos, focalPlane.position.y, focalPlane.position.z);
+        }
+        render();
 
-			window.addEventListener( 'resize', onWindowResize, false );
+    }
 
-		}
 
+    function onWindowResize() {
 
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        var aspect = window.innerWidth / window.innerHeight;
 
-		/* Author: David
-		*  Load NRRD-File and create Bounding-Box
-		*  If we have a new mesh, remove the old one
-		*/
-		function loadNRRDFile( filePath, file ){
-			if(mesh != null) {
-				scene.remove( mesh );
-				scene.remove( boundingBox );
-				scene.remove( focalPlane );
-			}
-			new NRRDLoader().load( filePath, function ( volume ) {
-
-
-
-				// Texture to hold the volume. We have scalars, so we put our data in the red channel.
-				// THREEJS will select R32F (33326) based on the THREE.RedFormat and THREE.FloatType.
-				// Also see https://www.khronos.org/registry/webgl/specs/latest/2.0/#TEXTURE_TYPES_FORMATS_FROM_DOM_ELEMENTS_TABLE
-				// TODO: look the dtype up in the volume metadata
-				var texture = new THREE.DataTexture3D( volume.data, volume.xLength, volume.yLength, volume.zLength );
-
-				if(file == "stent"){
-					texture.format = THREE.RedFormat;
-					texture.type = THREE.FloatType;
-				}else
-				{
-					texture.format = THREE.RedFormat;
-				}
+        var frustumHeight = camera.top - camera.bottom;
 
-				texture.minFilter = texture.magFilter = THREE.LinearFilter;
-				texture.unpackAlignment = 1;
+        camera.left = -frustumHeight * aspect / 2;
+        camera.right = frustumHeight * aspect / 2;
 
+        camera.updateProjectionMatrix();
 
+        render();
 
+    }
 
-				// Colormap textures
-				cmtextures = {
-					viridis: new THREE.TextureLoader().load( 'textures/cm_viridis.png', render ),
-					gray: new THREE.TextureLoader().load( 'textures/cm_gray.png', render )
-				};
 
-				// Material
-				var shader = VolumeRenderShader1;
+    function render() {
+        let points = [];
+        let materialProxy = new THREE.PointsMaterial({
+            color: 0x1ffff1
+        });
 
-				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+        if (volumeMesh != null) {
+            let proxGeos = proxyGeometries.getProxyGeometries(camera, true);
 
-				uniforms[ "u_data" ].value = texture;
-				uniforms[ "u_size" ].value.set( volume.xLength, volume.yLength, volume.zLength );
-				uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
-				uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
-				uniforms[ "u_renderthreshold" ].value = volconfig.isothreshold; // For ISO renderstyle
-				uniforms[ "u_cmdata" ].value = cmtextures[ volconfig.colormap ];
 
-				material = new THREE.ShaderMaterial( {
-					uniforms: uniforms,
-					vertexShader: shader.vertexShader,
-					fragmentShader: shader.fragmentShader,
-					side: THREE.BackSide // The volume shader uses the backface as its "reference point"
-				} );
+            proxGeos.forEach(element => {
+                //	let mesh = new THREE.Mesh(element, new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true }));
+                let mesh = new THREE.Mesh(element, material);
+                scene.add(mesh);
+                points.push(mesh);
+            });
 
-				// THREE.Mesh
-				var geometry = new THREE.BoxBufferGeometry( volume.xLength, volume.yLength, volume.zLength );
-				geometry.translate( volume.xLength / 2 - 0.5, volume.yLength / 2 - 0.5, volume.zLength / 2 - 0.5 );
 
-				mesh = new THREE.Mesh( geometry, material );
+        }
 
-				//scene.add( mesh );
+        //glClear(GL_DEPTH_BUFFER_BIT);
+        renderer.clear(renderer.DEPTH_BUFFER_BIT);
+        renderer.render(scene, camera);
 
-				//Create bounding box
-				boundingBox = new THREE.BoxHelper(mesh, 0xff0000);
-				boundingBox.update();
-				// If you want a visible bounding box
-				scene.add(boundingBox);
+        points.forEach(element => {
+            scene.remove(element);
+        });
+    }
 
-				//Visual presentation of focal plane
-				createFocalPlane(volume.xLength, volume.yLength, volume.zLength );
-				//Visual presentation of slices
-				//createSlices( volume.xLength, volume.yLength, volume.zLength );
+    /* Author: David
+        *  For DEBUGGING: Visualization of focal plane
+    */
+    function createFocalPlane(x, y, z) {
+        let geometry = new THREE.PlaneGeometry(x, z, y);
+        let opacity;
 
+        if (debugMode == true) {
+            opacity = 0.5;
+        } else {
+            opacity = 0.0;
+        }
+        let mat = new THREE.MeshBasicMaterial({
+            color: 0xffff00,
+            opacity: opacity,
+            transparent: true,
+            side: THREE.DoubleSide
+        });
 
-				//Update gui for the focal plane
-				focplaneposGUI = focplaneposGUI.min(1).max(volume.xLength).setValue(volume.xLength/2);
-				volconfig.focplanepos = volume.xLength/2;
-				volumeMesh = volume;
+        focalPlane = new THREE.Mesh(geometry, mat);
+        focalPlane.rotateX(Math.PI / 2);
+        focalPlane.rotateY(Math.PI / 2);
+        focalPlane.translateZ(y / 2);
+        focalPlane.translateX(x / 2);
 
-			//	Object.assign(volumeMesh, volume);
-				render();
+        focalPlane.translateY(z / 2);
 
-			} );
+        scene.add(focalPlane);
+    }
 
-		}
-
-		/* Author: David
-		* Update if a input-value changed
-		*/
-		function updateUniforms() {
-			if(actualVol != volconfig.volume) {
-				actualVol = volconfig.volume;
-				switch (volconfig.volume) {
-					case "teapot":
-						loadNRRDFile( "models/nrrd/teapot.nrrd", "teapot" );
-						break;
-					case "skull":
-						loadNRRDFile( "models/nrrd/skull.nrrd", "skull" );
-						break;
-					case "stent":
-						loadNRRDFile( "models/nrrd/stent.nrrd", "stent" );
-						break;
-					case "aneurism":
-						loadNRRDFile( "models/nrrd/aneurism.nrrd", "aneurism" );
-						break;
-					default:
-						loadNRRDFile( "models/nrrd/stent.nrrd", "stent" );
-				}
-
-			}
-
-
-			material.uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
-			material.uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
-			material.uniforms[ "u_renderthreshold" ].value = volconfig.isothreshold; // For ISO renderstyle
-			material.uniforms[ "u_cmdata" ].value = cmtextures[ volconfig.colormap ];
-
-
-			focalPlane.position.set(volconfig.focplanepos,focalPlane.position.y,focalPlane.position.z);
-
-
-			postprocessing.bokeh.uniforms[ "focus" ].value = volconfig.focplanepos;
-
-
-			render();
-
-		}
-
-
-
-		function onWindowResize() {
-
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			postprocessing.composer.setSize( window.innerWidth, window.innerHeight );
-			var aspect = window.innerWidth / window.innerHeight;
-
-			var frustumHeight = camera.top - camera.bottom;
-
-			camera.left = - frustumHeight * aspect / 2;
-			camera.right = frustumHeight * aspect / 2;
-
-			camera.updateProjectionMatrix();
-
-			render();
-
-		}
-
-		/* Author: WEGBL_postprocessing_dof
-		* Initialize Bluring-Pass
-		*/
-		function initPostprocessing() {
-
-
-
-			var renderPass = new RenderPass( scene, camera );
-
-			var bokehPass = new BokehPass( scene, camera, {
-				focus: 1.0,
-				aperture:	0.025,
-				maxblur:	1.0,
-
-				width: window.innerWidth,
-				height: window.innerHeight
-			} );
-
-			var composer = new EffectComposer( renderer );
-
-			composer.addPass( renderPass );
-			composer.addPass( bokehPass );
-
-			postprocessing.composer = composer;
-			postprocessing.bokeh = bokehPass;
-
-		}
-
-		function render() {
-
-
-			var points = [];
-			var materialProxy = new THREE.PointsMaterial({
-				color: 0x1ffff1
-			});
-
-			if(volumeMesh != null) {
-				let proxyGeometries = new ProxyGeometry();
-
-			//	console.log(volumeMesh);
-
-				var proxGeos = proxyGeometries.getProxyGeometry(camera, 15, 1, volumeMesh.xLength, volumeMesh);
-
-				proxGeos.forEach(element => {
-					var point = new THREE.Points(element, materialProxy);
-					scene.add(point);
-					points.push(point);
-				});
-
-
-			}
-			//glClear(GL_DEPTH_BUFFER_BIT);
-			renderer.clear(renderer.DEPTH_BUFFER_BIT);
-			renderer.render( scene, camera );
-
-			points.forEach(element => {
-				scene.remove(element);
-			});
-
-			//TODO: Blurring activate
-			//postprocessing.composer.render( 0.1 );
-
-		}
-
-
-		/* Author: David
-   		 *  For DEBUGGING: Visualization of focal plane
-    	*/
-		function createFocalPlane(x,y,z){
-			var geometry = new THREE.PlaneGeometry( x,z,y );
-			var opacity;
-
-			if(debugMode == true){
-				opacity = 0.5;
-			}else{
-				opacity = 0.0;
-			}
-			var mat = new THREE.MeshBasicMaterial( {color: 0xffff00, opacity: opacity, transparent: true, side: THREE.DoubleSide} );
-
-
-			focalPlane = new THREE.Mesh( geometry, mat );
-			focalPlane.rotateX(Math.PI/2);
-			focalPlane.rotateY(Math.PI/2);
-			focalPlane.translateZ(y/2);
-			focalPlane.translateX(x/2);;
-			focalPlane.translateY(z/2);
-
-			scene.add( focalPlane );
-		}
-
-		/* Author: David
-		*  Visualization for the slices
-		 */
-		function createSlices(x,y,z){
-
-			if(debugMode == true) {
-				var geometry = new THREE.PlaneGeometry( x, z, y );
-				var material = new THREE.MeshBasicMaterial( {
-					color: 0x1ffff1,
-					opacity: 1.0,
-					transparent: true,
-					side: THREE.DoubleSide
-				} );
-
-				var i;
-				var distanceSlices = 10;
-				var numberSlices = y / distanceSlices;
-
-
-
-				console.log( y );
-				for (i = 0; i < numberSlices; i ++) {
-					var slices = new THREE.Mesh( geometry, material );
-					slices.rotateX( Math.PI / 2 );
-					slices.rotateY( Math.PI / 2 );
-					slices.translateX( x / 2 );
-					slices.translateY( z / 2 );
-					slices.translateZ( i * distanceSlices );
-
-					scene.add( slices );
-
-
-					console.log( y );
-
-				}
-			}
-
-		}
-
-	</script>
+</script>
 
 </body>
 </html>

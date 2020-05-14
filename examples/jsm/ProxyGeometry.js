@@ -1,128 +1,138 @@
 import * as THREE from '../../build/three.module.js';
 
+//https://developer.nvidia.com/gpugems/gpugems/part-vi-beyond-triangles/chapter-39-volume-rendering-techniques
 class ProxyGeometry {
     proxyGeometry;
+    box;
+    corners;
+    lines;
+    intersections;
 
-    constructor() {
+    constructor(box) {
+        this.intersections = [];
+        this.box = box;
 
-    }
+        let min = box.min;
+        let max = box.max;
 
+        let minx = Math.min(min.x, max.x);
+        let miny = Math.min(min.y, max.y);
+        let minz = Math.min(min.z, max.z);
 
+        let maxx = Math.max(min.x, max.x);
+        let maxy = Math.max(min.y, max.y);
+        let maxz = Math.max(min.z, max.z);
 
-
-    intersect(a, b, normal){
-        var la = THREE.Vector4.dot(THREE.Vector4(a,1), normal);
-        var lb = THREE.Vector4.dot(THREE.Vector4(b,1), normal);
-
-        var t = la / (la - lb);
-        var interpol = THREE.Vector3(a * (1.0 - t) + b * t);
-
-        return interpol;
-
-    }
-
-    calcEdgeOrder(){
-
-        var edgeOrder = [];
-
-        edgeOrder[0] = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ]; // top
-        edgeOrder[1] = [ 1, 11, 9, 0, 3, 4, 8, 5, 2, 6, 7, 10 ]; // top
-        edgeOrder[2] = [ 7, 8, 0, 9, 6, 10, 11, 2, 5, 3, 1, 4 ]; // bottom
-        edgeOrder[3] = [ 10, 2, 3, 6, 9, 7, 5, 8, 11, 0, 4, 1 ]; // top
-        edgeOrder[4] = [ 11, 10, 6, 9, 0, 8, 7, 4, 1, 3, 5, 2 ]; // top
-        edgeOrder[5] = [ 5, 7, 9, 6, 3, 2, 10, 1, 4, 0, 11, 8 ]; // bottom
-        edgeOrder[6] = [ 7, 6, 2, 5, 8, 4, 3, 0, 9, 11, 1, 10 ]; // bottom
-        edgeOrder[7] = [ 4, 5, 6, 3, 0, 1, 2, 11, 8, 9, 10, 7 ]; // bottom
-
-        return edgeOrder;
-    }
-
-    calcPolygon(normal, cube, index){
-
-        var vertices = THREE.Vector3();
-        var edgeOrder = this.calcEdgeOrder();
-
-        for (let i = 0; i < edgeIndex[index].size(); i++) {
-            var edgeIndex = edgeOrder[index][i];
-        }
-
-
-    }
-
-    getProxyGeometry(camera, samples, minZ, maxZ, volume) {
-        this.proxyGeometry = [new THREE.Geometry(), samples];
-        // var m = new THREE.Matrix4();
-        // m.getInverse(modelMatrix);
-
-        var sliceDistance = Math.abs((maxZ-minZ)/samples);
-
-        var corners = [
-            new THREE.Vector3(volume.xLength / 2.0, volume.yLength / 2.0, volume.zLength / 2.0),
-            new THREE.Vector3(-volume.xLength / 2.0, volume.yLength / 2.0, volume.zLength / 2.0),
-            new THREE.Vector3(volume.xLength / 2.0, -volume.yLength / 2.0, volume.zLength / 2.0),
-            new THREE.Vector3(volume.xLength / 2.0, volume.yLength / 2.0, -volume.zLength / 2.0),
-            new THREE.Vector3(-volume.xLength / 2.0, volume.yLength / 2.0, -volume.zLength / 2.0),
-            new THREE.Vector3(-volume.xLength / 2.0, -volume.yLength / 2.0, volume.zLength / 2.0),
-            new THREE.Vector3(volume.xLength / 2.0, -volume.yLength / 2.0, -volume.zLength / 2.0),
-            new THREE.Vector3(-volume.xLength / 2.0, -volume.yLength / 2.0, -volume.zLength / 2.0)
+        this.corners = [
+            new THREE.Vector3(minx, miny, minz),
+            new THREE.Vector3(maxx, miny, minz),
+            new THREE.Vector3(minx, maxy, minz),
+            new THREE.Vector3(maxx, maxy, minz),
+            new THREE.Vector3(minx, miny, maxz),
+            new THREE.Vector3(maxx, miny, maxz),
+            new THREE.Vector3(minx, maxy, maxz),
+            new THREE.Vector3(maxx, maxy, maxz),
         ];
 
-        var lines = [
-            new THREE.Line3(corners[7], corners[4]),
-            new THREE.Line3(corners[4], corners[1]),
-            new THREE.Line3(corners[1], corners[0]),
-            new THREE.Line3(corners[1], corners[5]),
-            new THREE.Line3(corners[7], corners[5]),
-            new THREE.Line3(corners[5], corners[2]),
-            new THREE.Line3(corners[2], corners[0]),
-            new THREE.Line3(corners[6], corners[2]),
-            new THREE.Line3(corners[7], corners[6]),
-            new THREE.Line3(corners[6], corners[3]),
-            new THREE.Line3(corners[3], corners[0]),
-            new THREE.Line3(corners[3], corners[4])
+        this.lines = [
+            new THREE.Line3(this.corners[0], this.corners[1]),
+            new THREE.Line3(this.corners[2], this.corners[3]),
+            new THREE.Line3(this.corners[4], this.corners[5]),
+            new THREE.Line3(this.corners[6], this.corners[7]),
+
+            new THREE.Line3(this.corners[0], this.corners[2]),
+            new THREE.Line3(this.corners[1], this.corners[3]),
+            new THREE.Line3(this.corners[4], this.corners[6]),
+            new THREE.Line3(this.corners[5], this.corners[7]),
+
+            new THREE.Line3(this.corners[0], this.corners[4]),
+            new THREE.Line3(this.corners[1], this.corners[5]),
+            new THREE.Line3(this.corners[2], this.corners[6]),
+            new THREE.Line3(this.corners[3], this.corners[7])
         ];
+    }
 
-        var originPlane = new THREE.Plane(camera.direction, 0);
-        var alignedPlane = new THREE.Plane(camera.direction, originPlane.distanceToPoint(camera.position));
-        var diameter = corners[0].length();
+    /**
+     * Returns the intersection point of a plane/line intersection
+     * @param plane
+     * @param line
+     * @param vertices
+     */
+    calcIntersection(plane, line, vertices) {
+        let intersection = new THREE.Vector3();
+        let result = plane.intersectLine(line, intersection);
+        if (result !== undefined) vertices.push(intersection);
+    }
 
-        var cameraDirection = new THREE.Vector3();
+    /**
+     * Calculates the proxy geometries created by intersection view aligned slices with the volume bounding box
+     * @param camera
+     * @param backToFront
+     * @returns {Array}
+     */
+    getProxyGeometries(camera, backToFront) {
+        this.intersections = [];
+        let intersectionVertices;
+        let geometries = [];
+
+        let cameraDirection = new THREE.Vector3();
         camera.getWorldDirection(cameraDirection);
-        console.log(cameraDirection);
 
-        for (let i = 0; i < samples; i++) {
-            var plane = new THREE.Plane(cameraDirection, diameter - i * ((2 * diameter) / (samples - 1)));
+        let plane = new THREE.Plane(cameraDirection, 0);
 
-            this.proxyGeometry[i] = new THREE.Geometry();
+        do {
+            if (backToFront) {
+                plane.constant += 1;
+            } else {
+                plane.constant -= 1;
+            }
+            intersectionVertices = [];
 
-            //https://www.npmjs.com/package/threejs-slice-geometry
+            this.lines.forEach(line => {
+                this.calcIntersection(plane, line, intersectionVertices);
+            });
 
-            lines.forEach(element => {
-                var intersection = new THREE.Vector3();
-                var result = plane.intersectLine(element, intersection);
-             //   console.log("INTERSECT: ",result);
-                if(result === undefined ){
-                 //   console.log("No hit");
-                }else{
-                 //   console.log("WE GOT A HIT");
-                    this.proxyGeometry[i].vertices.push( intersection );
+            if (intersectionVertices.length) {
+                this.sortPolygonEdges(intersectionVertices);
+
+                let geometry = new THREE.Geometry();
+
+                geometry.vertices = intersectionVertices;
+
+                for (let face = 0; face < intersectionVertices.length - 1; face++) {
+                    geometry.faces.push(new THREE.Face3(intersectionVertices.length - 1, face, (face + 1) % (intersectionVertices.length - 1)));
                 }
-            })
+                geometries.push(geometry);
+            }
+        } while (intersectionVertices.length);
 
-       //     this.proxyGeometry[i].faces.push( new THREE.Face3( i*3, i*3 + 1, i*3 + 2 ) );
+        return geometries;
+    }
 
+    /**
+     * Calculates the centroid of intersectionVertices, sorts the intersection Vertices according in ascending order of the angle
+     * to the centroid, and adds the centroid at the end of intersectionVertices
+     * @param intersectionVertices
+     */
+    sortPolygonEdges(intersectionVertices) {
+        let centroid = new THREE.Vector3(0, 0, 0);
 
+        for (let i = 0; i < intersectionVertices.length; i++) {
+            centroid.add(intersectionVertices[i]);
+        }
+        centroid.divideScalar(intersectionVertices.length);
 
-       //     this.proxyGeometry[i] = alignedPlane;
+        let angles = [];
+        for (let i = 0; i < intersectionVertices.length; i++) {
+            angles[i] = Math.atan2((intersectionVertices[i].y - centroid.y), (intersectionVertices[i].x - centroid.x));
         }
 
-        this.proxyGeometry.forEach(element => {
-         //   console.log(element);
-        })
+        intersectionVertices.sort(function (a, b) {
+            return angles[intersectionVertices.indexOf(a)] - angles[intersectionVertices.indexOf(b)];
+        });
 
-
-        return this.proxyGeometry;
+        intersectionVertices.push(centroid);
     }
 }
 
-export { ProxyGeometry };
+export {ProxyGeometry};

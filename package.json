@@ -106,7 +106,5 @@
     ],
     "directories": {}
   },
-  "dependencies": {
-    "threejs-slice-geometry": "^0.2.2"
-  }
+  "dependencies": {}
 }

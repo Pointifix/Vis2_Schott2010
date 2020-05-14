@@ -38391,7 +38391,7 @@
 	// STEP 2 Turn path into shape.
 	// STEP 3 ExtrudeGeometry takes in Shape/Shapes
 	// STEP 3a - Extract points from each shape, turn to vertices
-	// STEP 3b - Triangulate each shape, add faces.
+	// STEP 3b - sortPolygonEdges each shape, add faces.
 
 	function Shape( points ) {
 
