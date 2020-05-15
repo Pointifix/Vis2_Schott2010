@@ -15,15 +15,15 @@
 <div id="container"></div>
 <div id="inset"></div>
 <script type="module">
-    import * as THREE from '../build/three.module.js';
-    import {GUI} from './jsm/libs/dat.gui.module.js';
-    import {OrbitControls} from './jsm/controls/OrbitControls.js';
-    import {NRRDLoader} from './jsm/loaders/NRRDLoader.js';
-    import {VolumeRenderShader1} from './jsm/shaders/VolumeShader/VolumeShader.js';
-    import {ProxyGeometry} from './jsm/ProxyGeometry.js';
-    import Stats from './jsm/libs/stats.module.js';
+    import * as THREE from './build/three.module.js';
+    import {GUI} from './examples/jsm/libs/dat.gui.module.js';
+    import {OrbitControls} from './examples/jsm/controls/OrbitControls.js';
+    import {NRRDLoader} from './examples/jsm/loaders/NRRDLoader.js';
+    import {VolumeRenderShader1} from './examples/jsm/shaders/VolumeShader/VolumeShader.js';
+    import {ProxyGeometry} from './examples/jsm/ProxyGeometry.js';
+    import Stats from './examples/jsm/libs/stats.module.js';
 
-    import {WEBGL} from './jsm/WebGL.js';
+    import {WEBGL} from './examples/jsm/WebGL.js';
 
     if (WEBGL.isWebGL2Available() === false) {
         document.body.appendChild(WEBGL.getWebGL2ErrorMessage());
@@ -162,7 +162,7 @@
         if (actualVol != volconfig.volume) {
             actualVol = volconfig.volume;
 
-            loadNRRDFile("models/nrrd/" + volconfig.volume + ".nrrd", volconfig.volume);
+            loadNRRDFile("./examples/models/nrrd/" + volconfig.volume + ".nrrd", volconfig.volume);
         }
 
         if (focalPlane != null) {
