@@ -3,17 +3,17 @@
 <head>
     <title>three.js webgl - volume rendering example</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <link type="text/css" rel="stylesheet" href="main.css">
+    <meta content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" name="viewport">
+    <link href="main.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
 <div id="info">
-    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Float volume render test (mip /
+    <a href="https://threejs.org" rel="noopener" target="_blank">three.js</a> - Float volume render test (mip /
     isosurface)
 </div>
+<div id="container"></div>
 <div id="inset"></div>
-
 <script type="module">
     import * as THREE from '../build/three.module.js';
     import {GUI} from './jsm/libs/dat.gui.module.js';
@@ -21,6 +21,7 @@
     import {NRRDLoader} from './jsm/loaders/NRRDLoader.js';
     import {VolumeRenderShader1} from './jsm/shaders/VolumeShader/VolumeShader.js';
     import {ProxyGeometry} from './jsm/ProxyGeometry.js';
+    import Stats from './jsm/libs/stats.module.js';
 
     import {WEBGL} from './jsm/WebGL.js';
 
@@ -30,49 +31,41 @@
 
     //True: Show the focal plane
     //False: Hide focal plane
-    var debugMode = false;
+    let debugMode = false;
 
-
-    var renderer, scene, camera, controls, material, volconfig, mesh, actualVol, focalPlane, focplaneposGUI,
-        boundingBox, volumeMesh;
+    let renderer, scene, camera, controls, material, volconfig, mesh, actualVol, focalPlane, focplaneposGUI,
+        boundingBox, volumeMesh, stats;
     let box;
     let proxyGeometries;
+    let container;
 
-
-    var renderTextures = ['stent', 'skull', 'aneurism', 'teapot'];
+    let renderTextures = ['stent', 'skull', 'aneurism', 'teapot'];
 
     init();
+    animate();
 
     function init() {
         scene = new THREE.Scene();
 
-
         // Create renderer
+        container = document.getElementById("container");
         let canvas = document.createElement('canvas');
         let context = canvas.getContext('webgl2', {alpha: true, antialias: false});
         renderer = new THREE.WebGLRenderer({canvas: canvas, context: context});
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+        container.appendChild(renderer.domElement);
 
-        // Create camera (The volume renderer does not work very well with perspective yet)
-        let h = 512; // frustum height
-        let aspect = window.innerWidth / window.innerHeight;
-        /*camera = new THREE.OrthographicCamera( - h * aspect / 2, h * aspect / 2, h / 2, - h / 2, 1, 1000 );
-        camera.position.set( 0, 0, 0 );
-        camera.up.set( 0, 0, 1 ); // In our data, z is up
-        camera.updateProjectionMatrix();*/
-
-        //TODO: Perspektivische Kamera für slice blurring?
-        camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 3000);
-        camera.position.z = -300;
-
+        var h = 512; // frustum height
+        var aspect = window.innerWidth / window.innerHeight;
+        camera = new THREE.OrthographicCamera(-h * aspect / 2, h * aspect / 2, h / 2, -h / 2, -1000, 1000);
         // Create controls
         controls = new OrbitControls(camera, renderer.domElement);
-        controls.addEventListener('change', render);
+
         controls.target.set(0, 0, 0);
-        controls.minZoom = 0.5;
-        controls.maxZoom = 4;
+        controls.enableDamping = true;
+        //controls.minZoom = 0.1;
+        //controls.maxZoom = 10.0;
         controls.update();
 
         // The gui for interaction
@@ -80,21 +73,19 @@
         actualVol = "stent";
         let gui = new GUI();
 
-
         gui.add(volconfig, 'volume', renderTextures // { aneurism: 'aneurism', leg: 'leg' }
         ).onChange(updateGUIValues);
         focplaneposGUI = gui.add(volconfig, 'focplanepos', 0, 200, 1).onChange(updateGUIValues);
         gui.add(volconfig, 'Blur', 0, 1, 0.01).onChange(updateGUIValues);
 
+        stats = new Stats();
+        container.appendChild(stats.dom);
 
         // Load the data ...
-        loadNRRDFile("models/nrrd/stent.nrrd", "stent");
-
+        updateGUIValues();
 
         window.addEventListener('resize', onWindowResize, false);
-
     }
-
 
     /* Author: David
     *  Load NRRD-File and create Bounding-Box
@@ -107,8 +98,6 @@
             scene.remove(focalPlane);
         }
         new NRRDLoader().load(filePath, function (volume) {
-
-
             var texture = new THREE.DataTexture3D(volume.data, volume.xLength, volume.yLength, volume.zLength);
 
             if (file == "stent") {
@@ -129,14 +118,17 @@
             uniforms["u_volume"].value = texture;
             uniforms["u_size"].value.set(volume.xLength, volume.yLength, volume.zLength);
 
-            console.log(uniforms["u_volume"].value);
+            controls.target.set(0, 0, 0);
+            camera.position.set(0, 0,(new THREE.Vector3(volume.xLength, volume.yLength, volume.zLength)).length());
+
+            controls.update();
 
             material = new THREE.ShaderMaterial({
                 uniforms: uniforms,
                 vertexShader: shader.vertexShader,
                 fragmentShader: shader.fragmentShader,
                 side: THREE.DoubleSide, // The volume shader uses the backface as its "reference point"
-                opacity: 0.4,
+                opacity: 0.1,
                 transparent: true
             });
 
@@ -160,10 +152,7 @@
             volumeMesh = volume;
 
             proxyGeometries = new ProxyGeometry(box.boundingBox);
-            render();
-
         });
-
     }
 
     /* Author: David
@@ -172,35 +161,16 @@
     function updateGUIValues() {
         if (actualVol != volconfig.volume) {
             actualVol = volconfig.volume;
-            switch (volconfig.volume) {
-                case "teapot":
-                    loadNRRDFile("models/nrrd/teapot.nrrd", "teapot");
-                    break;
-                case "skull":
-                    loadNRRDFile("models/nrrd/skull.nrrd", "skull");
-                    break;
-                case "stent":
-                    loadNRRDFile("models/nrrd/stent.nrrd", "stent");
-                    break;
-                case "aneurism":
-                    loadNRRDFile("models/nrrd/aneurism.nrrd", "aneurism");
-                    break;
-                default:
-                    loadNRRDFile("models/nrrd/stent.nrrd", "stent");
-            }
 
+            loadNRRDFile("models/nrrd/" + volconfig.volume + ".nrrd", volconfig.volume);
         }
 
         if (focalPlane != null) {
             focalPlane.position.set(volconfig.focplanepos, focalPlane.position.y, focalPlane.position.z);
         }
-        render();
-
     }
 
-
     function onWindowResize() {
-
         renderer.setSize(window.innerWidth, window.innerHeight);
         var aspect = window.innerWidth / window.innerHeight;
 
@@ -210,21 +180,22 @@
         camera.right = frustumHeight * aspect / 2;
 
         camera.updateProjectionMatrix();
-
-        render();
-
     }
 
+    function animate() {
+        requestAnimationFrame(animate);
+
+        controls.update();
+
+        render();
+        stats.update();
+    }
 
     function render() {
         let points = [];
-        let materialProxy = new THREE.PointsMaterial({
-            color: 0x1ffff1
-        });
 
         if (volumeMesh != null) {
             let proxGeos = proxyGeometries.getProxyGeometries(camera, true);
-
 
             proxGeos.forEach(element => {
                 //	let mesh = new THREE.Mesh(element, new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true }));
@@ -232,13 +203,11 @@
                 scene.add(mesh);
                 points.push(mesh);
             });
-
-
         }
 
-        //glClear(GL_DEPTH_BUFFER_BIT);
-        renderer.clear(renderer.DEPTH_BUFFER_BIT);
         renderer.render(scene, camera);
+
+        stats.update();
 
         points.forEach(element => {
             scene.remove(element);
@@ -274,8 +243,6 @@
 
         scene.add(focalPlane);
     }
-
 </script>
-
 </body>
 </html>

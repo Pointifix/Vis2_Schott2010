@@ -21,7 +21,7 @@ let VolumeRenderShader1 = {
 };
 
 let loader = new THREE.FileLoader();
-loader.load('jsm/shaders/VolumeShader/volumeVertexShader.glsl', function ( data ) { VolumeRenderShader1.vertexShader = data; });
-loader.load('jsm/shaders/VolumeShader/volumeFragmentShader.glsl', function ( data ) { VolumeRenderShader1.fragmentShader = data;	});
+loader.load('./examples/jsm/shaders/VolumeShader/volumeVertexShader.glsl', function ( data ) { VolumeRenderShader1.vertexShader = data; });
+loader.load('./examples/jsm/shaders/VolumeShader/volumeFragmentShader.glsl', function ( data ) { VolumeRenderShader1.fragmentShader = data;	});
 
 export { VolumeRenderShader1 };

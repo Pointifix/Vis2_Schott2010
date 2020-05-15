@@ -78,14 +78,13 @@ class ProxyGeometry {
         let cameraDirection = new THREE.Vector3();
         camera.getWorldDirection(cameraDirection);
 
-        let plane = new THREE.Plane(cameraDirection, 0);
+        let viewPlane = new THREE.Plane();
+        viewPlane.setFromNormalAndCoplanarPoint(cameraDirection, camera.position);
+
+        let plane = new THREE.Plane(cameraDirection, viewPlane.constant);
 
         do {
-            if (backToFront) {
-                plane.constant += 1;
-            } else {
-                plane.constant -= 1;
-            }
+            plane.constant--;
             intersectionVertices = [];
 
             this.lines.forEach(line => {
@@ -104,7 +103,7 @@ class ProxyGeometry {
                 }
                 geometries.push(geometry);
             }
-        } while (intersectionVertices.length);
+        } while (intersectionVertices.length || geometries.length == 0);
 
         return geometries;
     }
