@@ -8,8 +8,8 @@
 
 import {
 	Vector3
-} from "../../../../build/three.module.js";
-import * as THREE from "../../../../build/three.module.js";
+} from "../../../build/three.module.js";
+import * as THREE from "../../../build/three.module.js";
 
 let VolumeRenderShader1 = {
 	uniforms: {
@@ -21,7 +21,7 @@ let VolumeRenderShader1 = {
 };
 
 let loader = new THREE.FileLoader();
-loader.load('./examples/jsm/shaders/VolumeShader/volumeVertexShader.glsl', function ( data ) { VolumeRenderShader1.vertexShader = data; });
-loader.load('./examples/jsm/shaders/VolumeShader/volumeFragmentShader.glsl', function ( data ) { VolumeRenderShader1.fragmentShader = data;	});
+loader.load("./js/shaders/VolumeShader/volumeVertexShader.glsl", function ( data ) { VolumeRenderShader1.vertexShader = data; });
+loader.load("./js/shaders/VolumeShader/volumeFragmentShader.glsl", function ( data ) { VolumeRenderShader1.fragmentShader = data;	});
 
 export { VolumeRenderShader1 };
