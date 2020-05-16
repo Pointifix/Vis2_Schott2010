@@ -11,10 +11,10 @@ import {
 } from "../../../build/three.module.js";
 import * as THREE from "../../../build/three.module.js";
 
-let VolumeShader = {
+let DoFShader = {
     uniforms: {
-        "u_size": {value: new Vector3(1, 1, 1)},
-        "u_volume": {value: null}
+        "depthCoord": {value: null},
+        "circleOfConf": {value: null}
     },
     vertexShader: null,
     fragmentShader: null,
@@ -22,12 +22,12 @@ let VolumeShader = {
 
 let request = new XMLHttpRequest();
 
-request.open('GET', "./js/shaders/VolumeShader/volumeVertexShader.glsl", false);
+request.open('GET', "./js/shaders/DoFShader/DoFVertexShader.glsl", false);
 request.send('');
-VolumeShader.vertexShader = request.responseText;
+DoFShader.vertexShader = request.responseText;
 
-request.open('GET', "./js/shaders/VolumeShader/volumeFragmentShader.glsl", false);
+request.open('GET', "./js/shaders/DoFShader/DoFFragmentShader.glsl", false);
 request.send('');
-VolumeShader.fragmentShader = request.responseText;
+DoFShader.fragmentShader = request.responseText;
 
-export {VolumeShader};
+export {DoFShader};

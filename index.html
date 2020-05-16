@@ -37,8 +37,6 @@
     let volumeShader;
     let volumeShaderMaterial;
 
-    let proxyGeometries;
-
     init();
     animate();
 
@@ -80,6 +78,11 @@
         volumeManager = new VolumeManager(camera, controls, volumeShaderMaterial);
         guiManager = new GUIManager();
 
+        proxyGeometryGenerator.geometries.forEach(geometry => {
+            let mesh = new THREE.Mesh(geometry, volumeShaderMaterial);
+            scene.add(mesh);
+        });
+
         //Stats
         stats = new Stats();
         container.appendChild(stats.dom);
@@ -109,25 +112,22 @@
     }
 
     function render() {
-        let proxyMeshes = [];
-        let proxyGeometries = [];
+        if (!(proxyGeometryGenerator.box === undefined)) proxyGeometryGenerator.updateProxyGeometries(camera);
 
-        if (!(proxyGeometryGenerator.box === undefined)) proxyGeometries = proxyGeometryGenerator.updateProxyGeometries(camera);
-
-        proxyGeometries.forEach(proxyGeometry => {
-            let proxyMesh = new THREE.Mesh(proxyGeometry, volumeShaderMaterial);
-            scene.add(proxyMesh);
-            proxyMeshes.push(proxyMesh);
+        scene.children.forEach(mesh => {
+            //console.log(mesh);
         });
 
         renderer.render(scene, camera);
 
         stats.update();
-
-        proxyMeshes.forEach(element => {
-            scene.remove(element);
-        });
     }
+
+
+
+
+
+
 </script>
 </body>
 </html>

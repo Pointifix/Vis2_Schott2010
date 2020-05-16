@@ -55,6 +55,7 @@
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		document.body.appendChild(renderer.domElement);
 
+		var nextBuffer = renderer.createBuffer();
 		// Create camera (The volume renderer does not work very well with perspective yet)
 		let h = 512; // frustum height
 		let aspect = window.innerWidth / window.innerHeight;
@@ -94,10 +95,10 @@
 		focplaneposGUI = gui.add(volconfig, 'focplanepos', 0, 200, 1).onChange(updateGUIValues);
 		gui.add(volconfig, 'Blur', 0, 1, 0.01).onChange(updateGUIValues);
 
+		allocateFramebuffer();
 
 		// Load the data ...
-		loadNRRDFile("models/nrrd/stent.nrrd", "stent");
-
+		loadNRRDFile("misc/models/nrrd/stent.nrrd", "stent");
 
 		window.addEventListener('resize', onWindowResize, false);
 
@@ -150,12 +151,12 @@
 			box = new THREE.BoxBufferGeometry(volume.xLength, volume.yLength, volume.zLength);
 
 			mesh = new THREE.Mesh(box, material);
-			scene.add(mesh);
+			//scene.add(mesh);
 
 			//Create bounding box
 			boundingBox = new THREE.BoxHelper(mesh, 0xff0000);
 			boundingBox.update();
-			scene.add(boundingBox);
+		//	scene.add(boundingBox);
 
 			//Visual presentation of focal plane
 			//createFocalPlane(volume.xLength, volume.yLength, volume.zLength );
@@ -165,7 +166,7 @@
 			volconfig.focplanepos = volume.xLength / 2;
 			volumeMesh = volume;
 
-			proxyGeometries = new ProxyGeometryGenerator(box.boundingBox);
+		//	proxyGeometries = new ProxyGeometryGenerator(box.boundingBox);
 			render();
 
 		});
@@ -180,19 +181,19 @@
 			actualVol = volconfig.volume;
 			switch (volconfig.volume) {
 				case "teapot":
-					loadNRRDFile("models/nrrd/teapot.nrrd", "teapot");
+					loadNRRDFile("misc/models/nrrd/teapot.nrrd", "teapot");
 					break;
 				case "skull":
-					loadNRRDFile("models/nrrd/skull.nrrd", "skull");
+					loadNRRDFile("misc/models/nrrd/skull.nrrd", "skull");
 					break;
 				case "stent":
-					loadNRRDFile("models/nrrd/stent.nrrd", "stent");
+					loadNRRDFile("misc/models/nrrd/stent.nrrd", "stent");
 					break;
 				case "aneurism":
-					loadNRRDFile("models/nrrd/aneurism.nrrd", "aneurism");
+					loadNRRDFile("misc/models/nrrd/aneurism.nrrd", "aneurism");
 					break;
 				default:
-					loadNRRDFile("models/nrrd/stent.nrrd", "stent");
+					loadNRRDFile("misc/models/nrrd/stent.nrrd", "stent");
 			}
 
 		}
@@ -228,7 +229,7 @@
 			color: 0x1ffff1
 		});
 
-		if (volumeMesh != null) {
+	/*	if (volumeMesh != null) {
 			let proxGeos = proxyGeometries.updateProxyGeometries(camera, true);
 
 
@@ -240,7 +241,7 @@
 				points.push(mesh);
 			});
 		}
-
+*/
 		//glClear(GL_DEPTH_BUFFER_BIT);
 		renderer.clear(renderer.DEPTH_BUFFER_BIT);
 		renderer.render(scene, camera);
@@ -279,6 +280,105 @@
 
 		scene.add(focalPlane);
 	}
+
+
+	function renderBlur(){
+
+
+		let pBuffer = new THREE.WebGLRenderTarget();
+		let nBuffer = new THREE.WebGLRenderTarget();
+
+
+		let depth_distance = volumeMesh.depth / volumeMesh.width;
+		let slice_distance = depth_distance / volumeMesh.depth;
+		let inputGuiCircleOfConfusion = 50;
+		let counterI = 0;
+
+		proxyGeometryGenerator.geometries.forEach(geometry => {
+			if(counterI <= proxyGeometryGenerator.focalPlaneIndex()) {
+				let mesh = new THREE.Mesh(geometry, volumeShaderMaterial);
+				//		let depthCoord = s*sliceDistance;
+				let C = slice_distance * Math.abs(counterI - proxyGeometryGenerator.focalPlaneIndex) * inputGuiCircleOfConfusion;
+				counterI++;
+			}
+		});
+	}
+
+	/*function calculateCircleOfConfusion(zPosSlice, zPosFocal, inputGUI){
+
+		let normalizeMatrix = new THREE.Matrix4(0.5, 0, 0, 0.0, 0, 0.5, 0, 0.0, 0, 0, 0.5, 0.0, 0.5, 0.5, 0.5, 1.0);
+		let coCTexSpace;
+
+		let radiusCircle = inputGUI * Math.abs(zPosSlice - zPosFocal);
+		let cocViewSpace = new THREE.Vector4(radiusCircle, radiusCircle, Math.abs(z), 1.0);
+		let cocClipSpace = new THREE.Vector4(coCViewSpace, camera.projectionMatrix);
+		let tmp = new THREE.Vector4(cocClipSpace, normalizeMatrix);
+
+		coCTexSpace = new THREE.Vector2(tmp.x / tmp.w, tmp.y / tmp.w);
+		coCTexSpace.x = coCTexSpace.x / window.innerWidth;
+		coCTexSpace.y = coCTexSpace.y / window.innerHeight;
+
+
+	}
+*//*
+
+	function allocateFramebuffer(pBuffer, nPuffer){
+		console.log("FRAMEBUFFER");
+
+		//0 - 100
+		let focusPlanePosition = 100;
+
+		//1-100
+		let inputGUI = 100;
+		let cameraDirection = camera.position + new THREE.Vector3().normalize(camera.direction).addScalar(inputGUI);
+
+		//Position FocalPlane
+		let zPosFocal =  new THREE.Vector3(camera.position + THREE.Vector3.normal(cameraDirection) * focusPlanePosition * cameraDirection.length()).z;
+
+
+
+		let zPosSlice = 100;
+
+		proxyGeometryGenerator.geometries.forEach(geometry => {
+			let mesh = new THREE.Mesh(geometry, volumeShaderMaterial);
+
+			// provide texture coordinates for the rectangle.
+			//	var previousBuffer = renderer.createBuffer();
+			renderer.bindBuffer(renderer.ARRAY_BUFFER, pBuffer);
+			// Set Texcoords.
+			renderer.bufferData(renderer.ARRAY_BUFFER, new Float32Array([]),renderer.STATIC_DRAW);
+
+			// Create a buffer for positions
+			var nextBuffer = renderer.createBuffer();
+			// Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
+			renderer.bindBuffer(renderer.ARRAY_BUFFER, nPuffer);
+			// Put the positions in the buffer
+			renderer.bufferData(renderer.ARRAY_BUFFER, positions, renderer.STATIC_DRAW);
+
+
+			calculateCircleOfConfusion(zPosSlice, zPosFocal, inputGUI)
+
+			//Disable Blend
+			renderer.BLEND = false;
+
+			scene.add(mesh);
+		});
+
+
+		//buffer for slices
+		var positionBuffer = renderer.createBuffer();
+		renderer.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+		renderer.bufferData(gl.ARRAY_BUFFER, positions, renderer.STATIC_DRAW)
+
+
+		var proxyGeometryGenerator = new ProxyGeometryGenerator();
+
+		var countSlice = ProxyGeometryGenerator.MAX_SLICES_COUNT;
+
+	}*/
+
+
+
 
 </script>
 

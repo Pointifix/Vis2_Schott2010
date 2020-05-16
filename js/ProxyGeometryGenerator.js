@@ -1,6 +1,7 @@
 import * as THREE from '../build/three.module.js';
 
-const MAX_SLICES_COUNT = 256;
+const MAX_SLICES_COUNT = 512;
+const FOCAL_PLANE_DISTANCE = 100;
 
 //https://developer.nvidia.com/gpugems/gpugems/part-vi-beyond-triangles/chapter-39-volume-rendering-techniques
 class ProxyGeometryGenerator {
@@ -8,9 +9,7 @@ class ProxyGeometryGenerator {
     corners;
     edges;
 
-    vertices = new Array(MAX_SLICES_COUNT);
-    indices = new Array(MAX_SLICES_COUNT);
-    drawRange = new Array(MAX_SLICES_COUNT);
+    focalPlaneIndex = 0;
 
     geometries = new Array(MAX_SLICES_COUNT);
 
@@ -22,13 +21,12 @@ class ProxyGeometryGenerator {
         ProxyGeometryGenerator.exists = true;
 
         for (let i = 0; i < MAX_SLICES_COUNT; i++) {
-            this.vertices[i] = new Array(6 * 3).fill(0);
-            this.indices[i] = new Array(5 * 3).fill(0);
-        }
-        this.drawRange.fill(0);
-        this.geometries.fill(new THREE.BufferGeometry());
+            this.geometries[i] = new THREE.BufferGeometry();
 
-        console.log(this.vertices);
+            this.geometries[i].setIndex(new Array(6 * 3).fill(0));
+            this.geometries[i].setAttribute('position', new THREE.BufferAttribute(new Float32Array(7 * 3).fill(0), 3));
+            this.geometries[i].setDrawRange({start: 0, count: 0});
+        }
 
         return this;
     }
@@ -101,7 +99,6 @@ class ProxyGeometryGenerator {
      */
     updateProxyGeometries(camera) {
         let intersectionVertices = [];
-        let geometries = [];
 
         let cameraDirection = new THREE.Vector3();
         camera.getWorldDirection(cameraDirection);
@@ -113,8 +110,18 @@ class ProxyGeometryGenerator {
 
         let sliceIndex = 0;
 
+        let cameraDistance = viewPlane.constant * (1.0 / camera.zoom);
+
+        let focalPlaneSet = false;
+
         do {
             plane.constant--;
+
+            if (!focalPlaneSet && cameraDistance - FOCAL_PLANE_DISTANCE > plane.constant) {
+                this.focalPlaneIndex = sliceIndex;
+                focalPlaneSet = true;
+            }
+
             intersectionVertices = [];
 
             this.edges.forEach(line => {
@@ -124,28 +131,36 @@ class ProxyGeometryGenerator {
             if (intersectionVertices.length) {
                 this.sortPolygonEdges(intersectionVertices);
 
+                let geometry = this.geometries[sliceIndex];
+
                 for (let i = 0; i < intersectionVertices.length; i++) {
-                    this.vertices[sliceIndex][i * 3] = intersectionVertices[i].x;
-                    this.vertices[sliceIndex][i * 3 + 1] = intersectionVertices[i].y;
-                    this.vertices[sliceIndex][i * 3 + 2] = intersectionVertices[i].z;
+                    geometry.attributes.position.array[i * 3] = intersectionVertices[i].x;
+                    geometry.attributes.position.array[i * 3 + 1] = intersectionVertices[i].y;
+                    geometry.attributes.position.array[i * 3 + 2] = intersectionVertices[i].z;
                 }
-
-                let geometry = new THREE.Geometry();
-
-                geometry.vertices = intersectionVertices;
 
                 for (let face = 0; face < intersectionVertices.length - 1; face++) {
-                    this.indices[sliceIndex][face * 3] = intersectionVertices.length - 1;
-                    this.indices[sliceIndex][face * 3 + 1] = face;
-                    this.indices[sliceIndex][face * 3 + 2] = (face + 1) % (intersectionVertices.length - 1);
-
-                    geometry.faces.push(new THREE.Face3(intersectionVertices.length - 1, face, (face + 1) % (intersectionVertices.length - 1)));
+                    geometry.index.array[face * 3] = intersectionVertices.length - 1;
+                    geometry.index.array[face * 3 + 1] = face;
+                    geometry.index.array[face * 3 + 2] = (face + 1) % (intersectionVertices.length - 1);
                 }
-                geometries.push(geometry);
+
+                geometry.setDrawRange(0, (intersectionVertices.length - 1) * 3);
+
+                geometry.attributes.position.needsUpdate = true;
+                geometry.index.needsUpdate= true;
+
+                geometry.computeBoundingSphere();
 
                 sliceIndex++;
             }
-        } while ((intersectionVertices.length || geometries.length == 0) && sliceIndex < 256);
+        } while ((intersectionVertices.length || sliceIndex == 0) && sliceIndex < MAX_SLICES_COUNT);
+
+        console.log(this.focalPlaneIndex);
+
+        for(let i = sliceIndex; i < MAX_SLICES_COUNT; i++) {
+            this.geometries[i].setDrawRange(0, 0);
+        }
     }
 
     /**

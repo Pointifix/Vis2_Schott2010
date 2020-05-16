@@ -72,6 +72,8 @@ class VolumeManager {
         this.volumeShaderMaterial.uniforms["u_volume"].value = this.texture;
         this.volumeShaderMaterial.uniforms["u_size"].value.set(this.volume.xLength, this.volume.yLength, this.volume.zLength);
 
+        this.volumeShaderMaterial.needsUpdate = true
+
         this.boundingBox.min.set(-this.volume.xLength / 2, -this.volume.yLength / 2, -this.volume.zLength / 2);
         this.boundingBox.max.set(this.volume.xLength / 2, this.volume.yLength / 2, this.volume.zLength / 2);
 
