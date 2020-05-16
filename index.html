@@ -16,30 +16,28 @@
 <div id="inset"></div>
 <script type="module">
     import * as THREE from './build/three.module.js';
-    import {GUI} from './js/libs/dat.gui.module.js';
     import {OrbitControls} from './js/controls/OrbitControls.js';
-    import {NRRDLoader} from './js/loaders/NRRDLoader.js';
-    import {VolumeRenderShader1} from './js/shaders/VolumeShader/VolumeShader.js';
-    import {ProxyGeometry} from './js/ProxyGeometry.js';
     import Stats from './js/libs/stats.module.js';
-
     import {WEBGL} from './js/WebGL.js';
+    import {GUIManager} from "./js/GUIManager.js";
+    import {VolumeManager} from "./js/VolumeManager.js";
+    import {ProxyGeometryGenerator} from "./js/ProxyGeometryGenerator.js";
+    import {VolumeShader} from "./js/shaders/VolumeShader/VolumeShader.js";
 
     if (WEBGL.isWebGL2Available() === false) {
         document.body.appendChild(WEBGL.getWebGL2ErrorMessage());
     }
 
-    //True: Show the focal plane
-    //False: Hide focal plane
-    let debugMode = false;
+    let renderer, scene, camera, controls, stats, container;
 
-    let renderer, scene, camera, controls, material, volconfig, mesh, actualVol, focalPlane, focplaneposGUI,
-        boundingBox, volumeMesh, stats;
-    let box;
+    let guiManager;
+    let volumeManager;
+    let proxyGeometryGenerator;
+
+    let volumeShader;
+    let volumeShaderMaterial;
+
     let proxyGeometries;
-    let container;
-
-    let renderTextures = ['stent', 'skull', 'aneurism', 'teapot'];
 
     init();
     animate();
@@ -47,7 +45,7 @@
     function init() {
         scene = new THREE.Scene();
 
-        // Create renderer
+        //Renderer
         container = document.getElementById("container");
         let canvas = document.createElement('canvas');
         let context = canvas.getContext('webgl2', {alpha: true, antialias: false});
@@ -56,125 +54,44 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         container.appendChild(renderer.domElement);
 
-        var h = 512; // frustum height
-        var aspect = window.innerWidth / window.innerHeight;
+        //Camera
+        let h = 512;
+        let aspect = window.innerWidth / window.innerHeight;
         camera = new THREE.OrthographicCamera(-h * aspect / 2, h * aspect / 2, h / 2, -h / 2, -1000, 1000);
-        // Create controls
-        controls = new OrbitControls(camera, renderer.domElement);
 
-        controls.target.set(0, 0, 0);
+        //Controls
+        controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
-        //controls.minZoom = 0.1;
-        //controls.maxZoom = 10.0;
         controls.update();
 
-        // The gui for interaction
-        volconfig = {volume: 'teapot', focplanepos: 64, 'Blur': 1};
-        actualVol = "stent";
-        let gui = new GUI();
+        //Volume Shader
+        volumeShader = VolumeShader;
+        let uniforms = THREE.UniformsUtils.clone(volumeShader.uniforms);
 
-        gui.add(volconfig, 'volume', renderTextures // { aneurism: 'aneurism', leg: 'leg' }
-        ).onChange(updateGUIValues);
-        focplaneposGUI = gui.add(volconfig, 'focplanepos', 0, 200, 1).onChange(updateGUIValues);
-        gui.add(volconfig, 'Blur', 0, 1, 0.01).onChange(updateGUIValues);
+        volumeShaderMaterial = new THREE.ShaderMaterial({
+            uniforms: uniforms,
+            vertexShader: volumeShader.vertexShader,
+            fragmentShader: volumeShader.fragmentShader,
+            side: THREE.DoubleSide,
+        });
 
+        //Managers
+        proxyGeometryGenerator = new ProxyGeometryGenerator();
+        volumeManager = new VolumeManager(camera, controls, volumeShaderMaterial);
+        guiManager = new GUIManager();
+
+        //Stats
         stats = new Stats();
         container.appendChild(stats.dom);
-
-        // Load the data ...
-        updateGUIValues();
 
         window.addEventListener('resize', onWindowResize, false);
     }
 
-    /* Author: David
-    *  Load NRRD-File and create Bounding-Box
-    *  If we have a new mesh, remove the old one
-    */
-    function loadNRRDFile(filePath, file) {
-        if (mesh != null) {
-            scene.remove(mesh);
-            scene.remove(boundingBox);
-            scene.remove(focalPlane);
-        }
-        new NRRDLoader().load(filePath, function (volume) {
-            var texture = new THREE.DataTexture3D(volume.data, volume.xLength, volume.yLength, volume.zLength);
-
-            if (file == "stent") {
-                texture.format = THREE.RedFormat;
-                texture.type = THREE.FloatType;
-            } else {
-                texture.format = THREE.RedFormat;
-            }
-
-            texture.minFilter = texture.magFilter = THREE.LinearFilter;
-            texture.unpackAlignment = 1;
-
-            // Material
-            let shader = VolumeRenderShader1;
-
-            let uniforms = THREE.UniformsUtils.clone(shader.uniforms);
-
-            uniforms["u_volume"].value = texture;
-            uniforms["u_size"].value.set(volume.xLength, volume.yLength, volume.zLength);
-
-            controls.target.set(0, 0, 0);
-            camera.position.set(0, 0,(new THREE.Vector3(volume.xLength, volume.yLength, volume.zLength)).length());
-
-            controls.update();
-
-            material = new THREE.ShaderMaterial({
-                uniforms: uniforms,
-                vertexShader: shader.vertexShader,
-                fragmentShader: shader.fragmentShader,
-                side: THREE.DoubleSide, // The volume shader uses the backface as its "reference point"
-                opacity: 0.1,
-                transparent: true
-            });
-
-            // THREE.Mesh
-            box = new THREE.BoxBufferGeometry(volume.xLength, volume.yLength, volume.zLength);
-
-            mesh = new THREE.Mesh(box, material);
-            //scene.add(mesh);
-
-            //Create bounding box
-            boundingBox = new THREE.BoxHelper(mesh, 0xffff00);
-            boundingBox.update();
-            scene.add(boundingBox);
-
-            //Visual presentation of focal plane
-            //createFocalPlane(volume.xLength, volume.yLength, volume.zLength );
-
-            //Update gui for the focal plane
-            focplaneposGUI = focplaneposGUI.min(1).max(volume.xLength).setValue(volume.xLength / 2);
-            volconfig.focplanepos = volume.xLength / 2;
-            volumeMesh = volume;
-
-            proxyGeometries = new ProxyGeometry(box.boundingBox);
-        });
-    }
-
-    /* Author: David
-    * Update if a input-value changed
-    */
-    function updateGUIValues() {
-        if (actualVol != volconfig.volume) {
-            actualVol = volconfig.volume;
-
-            loadNRRDFile("./misc/models/nrrd/" + volconfig.volume + ".nrrd", volconfig.volume);
-        }
-
-        if (focalPlane != null) {
-            focalPlane.position.set(volconfig.focplanepos, focalPlane.position.y, focalPlane.position.z);
-        }
-    }
-
     function onWindowResize() {
         renderer.setSize(window.innerWidth, window.innerHeight);
-        var aspect = window.innerWidth / window.innerHeight;
+        let aspect = window.innerWidth / window.innerHeight;
 
-        var frustumHeight = camera.top - camera.bottom;
+        let frustumHeight = camera.top - camera.bottom;
 
         camera.left = -frustumHeight * aspect / 2;
         camera.right = frustumHeight * aspect / 2;
@@ -192,56 +109,24 @@
     }
 
     function render() {
-        let points = [];
+        let proxyMeshes = [];
+        let proxyGeometries = [];
 
-        if (volumeMesh != null) {
-            let proxGeos = proxyGeometries.getProxyGeometries(camera, true);
+        if (!(proxyGeometryGenerator.box === undefined)) proxyGeometries = proxyGeometryGenerator.updateProxyGeometries(camera);
 
-            proxGeos.forEach(element => {
-                //	let mesh = new THREE.Mesh(element, new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true }));
-                let mesh = new THREE.Mesh(element, material);
-                scene.add(mesh);
-                points.push(mesh);
-            });
-        }
+        proxyGeometries.forEach(proxyGeometry => {
+            let proxyMesh = new THREE.Mesh(proxyGeometry, volumeShaderMaterial);
+            scene.add(proxyMesh);
+            proxyMeshes.push(proxyMesh);
+        });
 
         renderer.render(scene, camera);
 
         stats.update();
 
-        points.forEach(element => {
+        proxyMeshes.forEach(element => {
             scene.remove(element);
         });
-    }
-
-    /* Author: David
-        *  For DEBUGGING: Visualization of focal plane
-    */
-    function createFocalPlane(x, y, z) {
-        let geometry = new THREE.PlaneGeometry(x, z, y);
-        let opacity;
-
-        if (debugMode == true) {
-            opacity = 0.5;
-        } else {
-            opacity = 0.0;
-        }
-        let mat = new THREE.MeshBasicMaterial({
-            color: 0xffff00,
-            opacity: opacity,
-            transparent: true,
-            side: THREE.DoubleSide
-        });
-
-        focalPlane = new THREE.Mesh(geometry, mat);
-        focalPlane.rotateX(Math.PI / 2);
-        focalPlane.rotateY(Math.PI / 2);
-        focalPlane.translateZ(y / 2);
-        focalPlane.translateX(x / 2);
-
-        focalPlane.translateY(z / 2);
-
-        scene.add(focalPlane);
     }
 </script>
 </body>

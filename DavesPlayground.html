@@ -19,8 +19,8 @@
 	import {GUI} from './js/libs/dat.gui.module.js';
 	import {OrbitControls} from './js/controls/OrbitControls.js';
 	import {NRRDLoader} from './js/loaders/NRRDLoader.js';
-	import {VolumeRenderShader1} from './js/shaders/VolumeShader/VolumeShader.js';
-	import {ProxyGeometry} from './js/ProxyGeometry.js';
+	import {VolumeShader} from './js/shaders/VolumeShader/VolumeShader.js';
+	import {ProxyGeometryGenerator} from './js/ProxyGeometryGenerator.js';
 
 	import {WEBGL} from './js/WebGL.js';
 
@@ -130,7 +130,7 @@
 			texture.unpackAlignment = 1;
 
 			// Material
-			let shader = VolumeRenderShader1;
+			let shader = VolumeShader;
 
 			let uniforms = THREE.UniformsUtils.clone(shader.uniforms);
 
@@ -165,7 +165,7 @@
 			volconfig.focplanepos = volume.xLength / 2;
 			volumeMesh = volume;
 
-			proxyGeometries = new ProxyGeometry(box.boundingBox);
+			proxyGeometries = new ProxyGeometryGenerator(box.boundingBox);
 			render();
 
 		});
@@ -229,7 +229,7 @@
 		});
 
 		if (volumeMesh != null) {
-			let proxGeos = proxyGeometries.getProxyGeometries(camera, true);
+			let proxGeos = proxyGeometries.updateProxyGeometries(camera, true);
 
 
 			console.log("MATERIALS: ", material);

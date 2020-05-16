@@ -113,7 +113,7 @@ class ProxyGeometry {
             }
 
 
-            /*   lines.forEach(element => {
+            /*   edges.forEach(element => {
                    var intersection = new THREE.Vector3();
                    var result = plane.intersectLine(element, intersection);
                 //   console.log("INTERSECT: ",result);
