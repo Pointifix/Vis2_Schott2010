@@ -22,6 +22,7 @@
     import {GUIManager} from "./js/GUIManager.js";
     import {VolumeManager} from "./js/VolumeManager.js";
     import {ProxyGeometryGenerator} from "./js/ProxyGeometryGenerator.js";
+    import {DoFShader} from "./js/shaders/DoFShader/DoFShader.js";
     import {VolumeShader} from "./js/shaders/VolumeShader/VolumeShader.js";
     import * as CONSTANTS from "./js/Constants.js";
 
@@ -35,11 +36,17 @@
     let volumeManager;
     let proxyGeometryGenerator;
 
-    let volumeShader;
-    let volumeShaderMaterial;
+    let dofShader;
+    let dofShaderMaterial;
 
-    let renderTargets = new Array(2);
-    let currentRenderTarget = false;
+    let compositionShader;
+    let compositionMaterial;
+
+    let f2bRenderTargets = new Array(2);
+    let f2bCurrentRenderTarget = false;
+
+    let b2fRenderTargets = new Array(2);
+    let b2fCurrentRenderTarget = false;
 
     let scenes = [CONSTANTS.MAX_SLICES_COUNT];
 
@@ -55,10 +62,9 @@
         container = document.getElementById("container");
         let canvas = document.createElement('canvas');
         let context = canvas.getContext('webgl2', {alpha: true, antialias: false});
-        renderer = new THREE.WebGLRenderer({canvas: canvas, context: context});
+        renderer = new THREE.WebGLRenderer({canvas: canvas, context: context, preserveDrawingBuffer: true});
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.autoClear = false;
         container.appendChild(renderer.domElement);
 
         //Camera
@@ -72,28 +78,46 @@
         controls.update();
 
         //Volume Shader
-        volumeShader = VolumeShader;
-        let uniforms = THREE.UniformsUtils.clone(volumeShader.uniforms);
+        dofShader = DoFShader;
+        let uniforms1 = THREE.UniformsUtils.clone(dofShader.uniforms);
 
-        volumeShaderMaterial = new THREE.ShaderMaterial({
-            uniforms: uniforms,
-            vertexShader: volumeShader.vertexShader,
-            fragmentShader: volumeShader.fragmentShader,
+        dofShaderMaterial = new THREE.ShaderMaterial({
+            uniforms: uniforms1,
+            vertexShader: dofShader.vertexShader,
+            fragmentShader: dofShader.fragmentShader,
             side: THREE.DoubleSide
         });
 
+        dofShaderMaterial.uniforms["u_screen_size"].value = new THREE.Vector2(window.innerWidth, window.innerHeight);
+
+        //Composition Shader
+        compositionShader = VolumeShader;
+        let uniforms2 = THREE.UniformsUtils.clone(compositionShader.uniforms);
+
+        compositionMaterial = new THREE.ShaderMaterial({
+            uniforms: uniforms2,
+            vertexShader: VolumeShader.vertexShader,
+            fragmentShader: VolumeShader.fragmentShader,
+            side: THREE.DoubleSide
+        });
+
+        compositionMaterial.uniforms["u_screen_size"].value = new THREE.Vector2(window.innerWidth, window.innerHeight);
+
         //Managers
         proxyGeometryGenerator = new ProxyGeometryGenerator();
-        volumeManager = new VolumeManager(camera, controls, volumeShaderMaterial);
+        volumeManager = new VolumeManager(camera, controls, dofShaderMaterial);
         guiManager = new GUIManager();
 
         //Framebuffer
-        renderTargets[0] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
-        renderTargets[1] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+        f2bRenderTargets[0] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+        f2bRenderTargets[1] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+
+        b2fRenderTargets[0] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+        b2fRenderTargets[1] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
 
         let i = 0;
         proxyGeometryGenerator.geometries.forEach(geometry => {
-            let proxyMesh = new THREE.Mesh(geometry, volumeShaderMaterial);
+            let proxyMesh = new THREE.Mesh(geometry, dofShaderMaterial);
             scenes[i].add(proxyMesh);
             i++;
         });
@@ -109,8 +133,14 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         let aspect = window.innerWidth / window.innerHeight;
 
-        renderTargets[0] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
-        renderTargets[1] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+        b2fRenderTargets[0] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+        b2fRenderTargets[1] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+
+        f2bRenderTargets[0] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+        f2bRenderTargets[1] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+
+        dofShaderMaterial.uniforms["u_screen_size"].value = new THREE.Vector2(window.innerWidth, window.innerHeight);
+        compositionMaterial.uniforms["u_screen_size"].value = new THREE.Vector2(window.innerWidth, window.innerHeight);
 
         let frustumHeight = camera.top - camera.bottom;
 
@@ -132,31 +162,51 @@
     }
 
     function render() {
+        renderer.setRenderTarget(b2fRenderTargets[b2fCurrentRenderTarget | 0]);
+        renderer.clear();
+        renderer.setRenderTarget(b2fRenderTargets[!b2fCurrentRenderTarget | 0]);
+        renderer.clear();
+        renderer.setRenderTarget(f2bRenderTargets[f2bCurrentRenderTarget | 0]);
+        renderer.clear();
+        renderer.setRenderTarget(f2bRenderTargets[!f2bCurrentRenderTarget | 0]);
+        renderer.clear();
+        renderer.setRenderTarget(null);
+        renderer.clear();
+
+        //f2b
         for (let i = 0; i < proxyGeometryGenerator.focalPlaneIndex; i++) {
-            volumeShaderMaterial.uniforms["u_prev"].value = renderTargets[!currentRenderTarget | 0].texture;
+            dofShaderMaterial.uniforms["u_prev"].value = f2bRenderTargets[!f2bCurrentRenderTarget | 0].texture;
 
-            renderer.setRenderTarget(renderTargets[currentRenderTarget | 0]);
+            renderer.setRenderTarget(f2bRenderTargets[f2bCurrentRenderTarget | 0]);
 
             renderer.render(scenes[i], camera);
-            currentRenderTarget = !currentRenderTarget;
+            f2bCurrentRenderTarget = !f2bCurrentRenderTarget;
         }
 
-        volumeShaderMaterial.uniforms["u_prev"].value = renderTargets[!currentRenderTarget | 0].texture;
-        renderer.setRenderTarget(null);
-        renderer.render(scenes[proxyGeometryGenerator.focalPlaneIndex], camera);
-
+        //b2f
         for (let i = proxyGeometryGenerator.sliceIndex; i > proxyGeometryGenerator.focalPlaneIndex; i--) {
-            volumeShaderMaterial.uniforms["u_prev"].value = renderTargets[!currentRenderTarget | 0].texture;
 
-            renderer.setRenderTarget(renderTargets[currentRenderTarget | 0]);
+            dofShaderMaterial.uniforms["u_prev"].value = b2fRenderTargets[!b2fCurrentRenderTarget | 0].texture;
+
+            renderer.setRenderTarget(b2fRenderTargets[b2fCurrentRenderTarget | 0]);
 
             renderer.render(scenes[i], camera);
-            currentRenderTarget = !currentRenderTarget;
+            b2fCurrentRenderTarget = !b2fCurrentRenderTarget;
         }
 
-        volumeShaderMaterial.uniforms["u_prev"].value = renderTargets[!currentRenderTarget | 0].texture;
+        compositionMaterial.uniforms["u_f2b"].value = f2bRenderTargets[!f2bCurrentRenderTarget | 0].texture;
+        compositionMaterial.uniforms["u_b2f"].value = b2fRenderTargets[!b2fCurrentRenderTarget | 0].texture;
         renderer.setRenderTarget(null);
+
+        let mesh = scenes[proxyGeometryGenerator.focalPlaneIndex].children[0];
+        scenes[proxyGeometryGenerator.focalPlaneIndex].remove(scenes[proxyGeometryGenerator.focalPlaneIndex].children[0]);
+
+        scenes[proxyGeometryGenerator.focalPlaneIndex].add(new THREE.Mesh(mesh.geometry, compositionMaterial));
+
         renderer.render(scenes[proxyGeometryGenerator.focalPlaneIndex], camera);
+
+        scenes[proxyGeometryGenerator.focalPlaneIndex].remove(scenes[proxyGeometryGenerator.focalPlaneIndex].children[0]);
+        scenes[proxyGeometryGenerator.focalPlaneIndex].add(mesh);
 
         stats.update();
     }

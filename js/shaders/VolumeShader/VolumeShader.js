@@ -7,15 +7,16 @@
  */
 
 import {
-    Vector3
+    Vector3,
+    Vector2
 } from "../../../build/three.module.js";
 import * as THREE from "../../../build/three.module.js";
 
 let VolumeShader = {
     uniforms: {
-        "u_size": {value: new Vector3(1, 1, 1)},
-        "u_volume": {value: null},
-        "u_prev": {value: null}
+        "u_screen_size": {value: new Vector2(1, 1)},
+        "u_f2b": {value: null},
+        "u_b2f": {value: null}
     },
     vertexShader: null,
     fragmentShader: null,
