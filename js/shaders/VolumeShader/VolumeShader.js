@@ -14,7 +14,8 @@ import * as THREE from "../../../build/three.module.js";
 let VolumeShader = {
     uniforms: {
         "u_size": {value: new Vector3(1, 1, 1)},
-        "u_volume": {value: null}
+        "u_volume": {value: null},
+        "u_prev": {value: null}
     },
     vertexShader: null,
     fragmentShader: null,

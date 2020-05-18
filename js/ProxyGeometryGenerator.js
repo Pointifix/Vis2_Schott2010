@@ -1,7 +1,6 @@
 import * as THREE from '../build/three.module.js';
 
-const MAX_SLICES_COUNT = 512;
-const FOCAL_PLANE_DISTANCE = 100;
+import * as CONSTANTS from "./Constants.js";
 
 //https://developer.nvidia.com/gpugems/gpugems/part-vi-beyond-triangles/chapter-39-volume-rendering-techniques
 class ProxyGeometryGenerator {
@@ -10,8 +9,9 @@ class ProxyGeometryGenerator {
     edges;
 
     focalPlaneIndex = 0;
+    sliceIndex = 0;
 
-    geometries = new Array(MAX_SLICES_COUNT);
+    geometries = new Array(CONSTANTS.MAX_SLICES_COUNT);
 
     constructor() {
         if (ProxyGeometryGenerator.exists) {
@@ -20,7 +20,7 @@ class ProxyGeometryGenerator {
         ProxyGeometryGenerator.instance = this;
         ProxyGeometryGenerator.exists = true;
 
-        for (let i = 0; i < MAX_SLICES_COUNT; i++) {
+        for (let i = 0; i < CONSTANTS.MAX_SLICES_COUNT; i++) {
             this.geometries[i] = new THREE.BufferGeometry();
 
             this.geometries[i].setIndex(new Array(6 * 3).fill(0));
@@ -117,7 +117,7 @@ class ProxyGeometryGenerator {
         do {
             plane.constant--;
 
-            if (!focalPlaneSet && cameraDistance - FOCAL_PLANE_DISTANCE > plane.constant) {
+            if (!focalPlaneSet && cameraDistance - CONSTANTS.FOCAL_PLANE_DISTANCE > plane.constant) {
                 this.focalPlaneIndex = sliceIndex;
                 focalPlaneSet = true;
             }
@@ -154,13 +154,9 @@ class ProxyGeometryGenerator {
 
                 sliceIndex++;
             }
-        } while ((intersectionVertices.length || sliceIndex == 0) && sliceIndex < MAX_SLICES_COUNT);
+        } while ((intersectionVertices.length || sliceIndex == 0) && sliceIndex < CONSTANTS.MAX_SLICES_COUNT);
 
-        console.log(this.focalPlaneIndex);
-
-        for(let i = sliceIndex; i < MAX_SLICES_COUNT; i++) {
-            this.geometries[i].setDrawRange(0, 0);
-        }
+        this.sliceIndex = sliceIndex;
     }
 
     /**

@@ -23,12 +23,13 @@
     import {VolumeManager} from "./js/VolumeManager.js";
     import {ProxyGeometryGenerator} from "./js/ProxyGeometryGenerator.js";
     import {VolumeShader} from "./js/shaders/VolumeShader/VolumeShader.js";
+    import * as CONSTANTS from "./js/Constants.js";
 
     if (WEBGL.isWebGL2Available() === false) {
         document.body.appendChild(WEBGL.getWebGL2ErrorMessage());
     }
 
-    let renderer, scene, camera, controls, stats, container;
+    let renderer, camera, controls, stats, container;
 
     let guiManager;
     let volumeManager;
@@ -37,11 +38,18 @@
     let volumeShader;
     let volumeShaderMaterial;
 
+    let renderTargets = new Array(2);
+    let currentRenderTarget = false;
+
+    let scenes = [CONSTANTS.MAX_SLICES_COUNT];
+
     init();
     animate();
 
     function init() {
-        scene = new THREE.Scene();
+        for (let i = 0; i < CONSTANTS.MAX_SLICES_COUNT; i++) {
+            scenes[i] = new THREE.Scene();
+        }
 
         //Renderer
         container = document.getElementById("container");
@@ -50,6 +58,7 @@
         renderer = new THREE.WebGLRenderer({canvas: canvas, context: context});
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.autoClear = false;
         container.appendChild(renderer.domElement);
 
         //Camera
@@ -70,7 +79,7 @@
             uniforms: uniforms,
             vertexShader: volumeShader.vertexShader,
             fragmentShader: volumeShader.fragmentShader,
-            side: THREE.DoubleSide,
+            side: THREE.DoubleSide
         });
 
         //Managers
@@ -78,9 +87,15 @@
         volumeManager = new VolumeManager(camera, controls, volumeShaderMaterial);
         guiManager = new GUIManager();
 
+        //Framebuffer
+        renderTargets[0] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+        renderTargets[1] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+
+        let i = 0;
         proxyGeometryGenerator.geometries.forEach(geometry => {
-            let mesh = new THREE.Mesh(geometry, volumeShaderMaterial);
-            scene.add(mesh);
+            let proxyMesh = new THREE.Mesh(geometry, volumeShaderMaterial);
+            scenes[i].add(proxyMesh);
+            i++;
         });
 
         //Stats
@@ -94,6 +109,9 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         let aspect = window.innerWidth / window.innerHeight;
 
+        renderTargets[0] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+        renderTargets[1] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+
         let frustumHeight = camera.top - camera.bottom;
 
         camera.left = -frustumHeight * aspect / 2;
@@ -105,6 +123,8 @@
     function animate() {
         requestAnimationFrame(animate);
 
+        if (!(proxyGeometryGenerator.box === undefined)) proxyGeometryGenerator.updateProxyGeometries(camera);
+
         controls.update();
 
         render();
@@ -112,22 +132,34 @@
     }
 
     function render() {
-        if (!(proxyGeometryGenerator.box === undefined)) proxyGeometryGenerator.updateProxyGeometries(camera);
+        for (let i = 0; i < proxyGeometryGenerator.focalPlaneIndex; i++) {
+            volumeShaderMaterial.uniforms["u_prev"].value = renderTargets[!currentRenderTarget | 0].texture;
 
-        scene.children.forEach(mesh => {
-            //console.log(mesh);
-        });
+            renderer.setRenderTarget(renderTargets[currentRenderTarget | 0]);
 
-        renderer.render(scene, camera);
+            renderer.render(scenes[i], camera);
+            currentRenderTarget = !currentRenderTarget;
+        }
+
+        volumeShaderMaterial.uniforms["u_prev"].value = renderTargets[!currentRenderTarget | 0].texture;
+        renderer.setRenderTarget(null);
+        renderer.render(scenes[proxyGeometryGenerator.focalPlaneIndex], camera);
+
+        for (let i = proxyGeometryGenerator.sliceIndex; i > proxyGeometryGenerator.focalPlaneIndex; i--) {
+            volumeShaderMaterial.uniforms["u_prev"].value = renderTargets[!currentRenderTarget | 0].texture;
+
+            renderer.setRenderTarget(renderTargets[currentRenderTarget | 0]);
+
+            renderer.render(scenes[i], camera);
+            currentRenderTarget = !currentRenderTarget;
+        }
+
+        volumeShaderMaterial.uniforms["u_prev"].value = renderTargets[!currentRenderTarget | 0].texture;
+        renderer.setRenderTarget(null);
+        renderer.render(scenes[proxyGeometryGenerator.focalPlaneIndex], camera);
 
         stats.update();
     }
-
-
-
-
-
-
 </script>
 </body>
 </html>
