@@ -173,9 +173,15 @@
         renderer.setRenderTarget(null);
         renderer.clear();
 
+		dofShaderMaterial.uniforms["depthCoord"].value = guiManager.focplaneposValue;
+		dofShaderMaterial.uniforms["circleOfConf"].value = guiManager.blurValue;
+
+
+
         //f2b
         for (let i = 0; i < proxyGeometryGenerator.focalPlaneIndex; i++) {
             dofShaderMaterial.uniforms["u_prev"].value = f2bRenderTargets[!f2bCurrentRenderTarget | 0].texture;
+			dofShaderMaterial.uniforms["FRONT2BACK"].value = 1;
 
             renderer.setRenderTarget(f2bRenderTargets[f2bCurrentRenderTarget | 0]);
 
@@ -186,6 +192,7 @@
         //b2f
         for (let i = proxyGeometryGenerator.sliceIndex; i > proxyGeometryGenerator.focalPlaneIndex; i--) {
 
+			dofShaderMaterial.uniforms["FRONT2BACK"].value = 0;
             dofShaderMaterial.uniforms["u_prev"].value = b2fRenderTargets[!b2fCurrentRenderTarget | 0].texture;
 
             renderer.setRenderTarget(b2fRenderTargets[b2fCurrentRenderTarget | 0]);

@@ -19,7 +19,9 @@ let DoFShader = {
         "u_volume": {value: null},
         "u_prev": {value: null},
         "depthCoord": {value: null},
-        "circleOfConf": {value: null}
+        "distance": {value: null},
+        "circleOfConf": {value: null},
+        "FRONT2BACK": {value: null}
     },
     vertexShader: null,
     fragmentShader: null,

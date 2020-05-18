@@ -20,6 +20,7 @@
 	import {OrbitControls} from './js/controls/OrbitControls.js';
 	import {NRRDLoader} from './js/loaders/NRRDLoader.js';
 	import {VolumeShader} from './js/shaders/VolumeShader/VolumeShader.js';
+	import {DoFShader} from "./js/shaders/DoFShader/DoFShader.js";
 	import {ProxyGeometryGenerator} from './js/ProxyGeometryGenerator.js';
 
 	import {WEBGL} from './js/WebGL.js';
@@ -28,6 +29,7 @@
 		document.body.appendChild(WEBGL.getWebGL2ErrorMessage());
 	}
 
+	let proxyGeometryGenerator;
 	//True: Show the focal plane
 	//False: Hide focal plane
 	var debugMode = false;
@@ -46,7 +48,6 @@
 	function init() {
 		scene = new THREE.Scene();
 
-
 		// Create renderer
 		let canvas = document.createElement('canvas');
 		let context = canvas.getContext('webgl2', {alpha: true, antialias: false});
@@ -55,7 +56,6 @@
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		document.body.appendChild(renderer.domElement);
 
-		var nextBuffer = renderer.createBuffer();
 		// Create camera (The volume renderer does not work very well with perspective yet)
 		let h = 512; // frustum height
 		let aspect = window.innerWidth / window.innerHeight;
@@ -94,8 +94,6 @@
 		).onChange(updateGUIValues);
 		focplaneposGUI = gui.add(volconfig, 'focplanepos', 0, 200, 1).onChange(updateGUIValues);
 		gui.add(volconfig, 'Blur', 0, 1, 0.01).onChange(updateGUIValues);
-
-		allocateFramebuffer();
 
 		// Load the data ...
 		loadNRRDFile("misc/models/nrrd/stent.nrrd", "stent");
@@ -166,6 +164,9 @@
 			volconfig.focplanepos = volume.xLength / 2;
 			volumeMesh = volume;
 
+
+			proxyGeometryGenerator = new ProxyGeometryGenerator();
+
 		//	proxyGeometries = new ProxyGeometryGenerator(box.boundingBox);
 			render();
 
@@ -229,6 +230,8 @@
 			color: 0x1ffff1
 		});
 
+		renderBlur();
+
 	/*	if (volumeMesh != null) {
 			let proxGeos = proxyGeometries.updateProxyGeometries(camera, true);
 
@@ -241,14 +244,14 @@
 				points.push(mesh);
 			});
 		}
-*/
+
 		//glClear(GL_DEPTH_BUFFER_BIT);
 		renderer.clear(renderer.DEPTH_BUFFER_BIT);
 		renderer.render(scene, camera);
 
 		points.forEach(element => {
 			scene.remove(element);
-		});
+		});*/
 	}
 
 	/* Author: David
@@ -282,26 +285,64 @@
 	}
 
 
+	const pBuffer = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+	const nBuffer = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+
+//	var bufferTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter});
+
+
 	function renderBlur(){
 
+		if(volumeMesh != null) {
+			let depth_distance = volumeMesh.zLength / volumeMesh.xLength;
+			let slice_distance = depth_distance / volumeMesh.zLength;
+			let inputGuiCircleOfConfusion = 50;
+			let counterI = 0;
+			// Material
+			let dofShader = DoFShader;
 
-		let pBuffer = new THREE.WebGLRenderTarget();
-		let nBuffer = new THREE.WebGLRenderTarget();
+			let uniformd = THREE.UniformsUtils.clone(dofShader.uniforms);
+
+			let sliceDistance = 256 / proxyGeometryGenerator.geometries.length;
+
+			proxyGeometryGenerator.geometries.forEach( geometry => {
+				if (counterI <= proxyGeometryGenerator.focalPlaneIndex) {
 
 
-		let depth_distance = volumeMesh.depth / volumeMesh.width;
-		let slice_distance = depth_distance / volumeMesh.depth;
-		let inputGuiCircleOfConfusion = 50;
-		let counterI = 0;
+					let mesh = new THREE.Mesh( geometry,material );
 
-		proxyGeometryGenerator.geometries.forEach(geometry => {
-			if(counterI <= proxyGeometryGenerator.focalPlaneIndex()) {
-				let mesh = new THREE.Mesh(geometry, volumeShaderMaterial);
-				//		let depthCoord = s*sliceDistance;
-				let C = slice_distance * Math.abs(counterI - proxyGeometryGenerator.focalPlaneIndex) * inputGuiCircleOfConfusion;
-				counterI++;
-			}
-		});
+
+					let depthCoord = counterI * sliceDistance;
+					let C = slice_distance * Math.abs( counterI - proxyGeometryGenerator.focalPlaneIndex ) * inputGuiCircleOfConfusion;
+
+
+
+					uniformd["depthCoord"].value = depthCoord;
+					uniformd["distance"].value = sliceDistance;
+
+
+					uniformd["circleOfConf"].value = C;
+					uniformd["FRONT2BACK"].value = false;
+
+
+					var volumeShaderMaterial = new THREE.ShaderMaterial( {
+						uniforms: uniformd,
+						vertexShader: dofShader.vertexShader,
+						fragmentShader: dofShader.fragmentShader,
+						map: pBuffer.texture,
+						side: THREE.DoubleSide,
+					} );
+
+
+					counterI ++;
+					renderer.setRenderTarget( pBuffer );
+					renderer.clear();
+					renderer.render( scene, camera );
+					renderer.setRenderTarget( null );
+				}
+			} );
+
+		}
 	}
 
 	/*function calculateCircleOfConfusion(zPosSlice, zPosFocal, inputGUI){
