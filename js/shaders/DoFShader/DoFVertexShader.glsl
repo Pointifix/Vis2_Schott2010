@@ -15,8 +15,6 @@ void main() {
 	C = transProjMatrix * C;
 	Ct = vec2(C.x / C.w, C.y / C.w);
 
-
-
 	frag_pos = modelMatrix * vec4(position, 1.0);
 
 	vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);

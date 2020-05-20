@@ -50,10 +50,15 @@
 
     let scenes = [CONSTANTS.MAX_SLICES_COUNT];
 
+    let transferTextures;
+
+    let quadCamera, quadMesh;
+
     init();
     animate();
 
     function init() {
+        //Scenes
         for (let i = 0; i < CONSTANTS.MAX_SLICES_COUNT; i++) {
             scenes[i] = new THREE.Scene();
         }
@@ -66,11 +71,13 @@
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
         container.appendChild(renderer.domElement);
+        renderer.autoClear = false;
 
         //Camera
         let h = 512;
         let aspect = window.innerWidth / window.innerHeight;
         camera = new THREE.OrthographicCamera(-h * aspect / 2, h * aspect / 2, h / 2, -h / 2, -1000, 1000);
+        camera.prevZoom = Number.MAX_VALUE;
 
         //Controls
         controls = new OrbitControls(camera, renderer.domElement);
@@ -85,7 +92,9 @@
             uniforms: uniforms1,
             vertexShader: dofShader.vertexShader,
             fragmentShader: dofShader.fragmentShader,
-            side: THREE.DoubleSide
+            side: THREE.DoubleSide,
+            transparent: true,
+            depthTest: false
         });
 
         dofShaderMaterial.uniforms["u_screen_size"].value = new THREE.Vector2(window.innerWidth, window.innerHeight);
@@ -98,7 +107,9 @@
             uniforms: uniforms2,
             vertexShader: VolumeShader.vertexShader,
             fragmentShader: VolumeShader.fragmentShader,
-            side: THREE.DoubleSide
+            side: THREE.DoubleSide,
+            transparent: true,
+            depthTest: false
         });
 
         compositionMaterial.uniforms["u_screen_size"].value = new THREE.Vector2(window.innerWidth, window.innerHeight);
@@ -121,6 +132,18 @@
             scenes[i].add(proxyMesh);
             i++;
         });
+
+        //Transfer Functions
+        transferTextures = {
+            viridis: new THREE.TextureLoader().load('misc/textures/cm_viridis.png', render),
+            gray: new THREE.TextureLoader().load('misc/textures/cm_gray.png', render)
+        };
+
+        compositionMaterial.uniforms["u_transfer"].value = transferTextures.gray;
+
+        //Screen Quad
+        quadCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+        quadMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), compositionMaterial );
 
         //Stats
         stats = new Stats();
@@ -155,10 +178,12 @@
 
         if (!(proxyGeometryGenerator.box === undefined)) proxyGeometryGenerator.updateProxyGeometries(camera);
 
-        controls.update();
+        if (controls.update() || camera.zoom != camera.prevZoom) {
+            render();
+            stats.update();
 
-        render();
-        stats.update();
+            camera.prevZoom = camera.zoom;
+        }
     }
 
     function render() {
@@ -173,15 +198,13 @@
         renderer.setRenderTarget(null);
         renderer.clear();
 
-		dofShaderMaterial.uniforms["depthCoord"].value = guiManager.focplaneposValue;
-		dofShaderMaterial.uniforms["circleOfConf"].value = guiManager.blurValue;
-
-
+        dofShaderMaterial.uniforms["depthCoord"].value = guiManager.focplaneposValue;
+        dofShaderMaterial.uniforms["circleOfConf"].value = guiManager.blurValue;
 
         //f2b
         for (let i = 0; i < proxyGeometryGenerator.focalPlaneIndex; i++) {
             dofShaderMaterial.uniforms["u_prev"].value = f2bRenderTargets[!f2bCurrentRenderTarget | 0].texture;
-			dofShaderMaterial.uniforms["FRONT2BACK"].value = 1;
+            dofShaderMaterial.uniforms["FRONT2BACK"].value = 1;
 
             renderer.setRenderTarget(f2bRenderTargets[f2bCurrentRenderTarget | 0]);
 
@@ -190,9 +213,9 @@
         }
 
         //b2f
-        for (let i = proxyGeometryGenerator.sliceIndex; i > proxyGeometryGenerator.focalPlaneIndex; i--) {
+        for (let i = proxyGeometryGenerator.sliceIndex; i >= proxyGeometryGenerator.focalPlaneIndex; i--) {
 
-			dofShaderMaterial.uniforms["FRONT2BACK"].value = 0;
+            dofShaderMaterial.uniforms["FRONT2BACK"].value = 0;
             dofShaderMaterial.uniforms["u_prev"].value = b2fRenderTargets[!b2fCurrentRenderTarget | 0].texture;
 
             renderer.setRenderTarget(b2fRenderTargets[b2fCurrentRenderTarget | 0]);
@@ -210,7 +233,7 @@
 
         scenes[proxyGeometryGenerator.focalPlaneIndex].add(new THREE.Mesh(mesh.geometry, compositionMaterial));
 
-        renderer.render(scenes[proxyGeometryGenerator.focalPlaneIndex], camera);
+        renderer.render(quadMesh, quadCamera);
 
         scenes[proxyGeometryGenerator.focalPlaneIndex].remove(scenes[proxyGeometryGenerator.focalPlaneIndex].children[0]);
         scenes[proxyGeometryGenerator.focalPlaneIndex].add(mesh);
