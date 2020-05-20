@@ -40,20 +40,28 @@ class VolumeManager {
         return this;
     }
 
-    loadNRRDFile(filePath, file) {
+    loadNRRDFile(filePath, file, guiManager) {
         this.currentFileName = file;
 
         let callBackFunction = (function(volume) {
-            this.updateVolume(volume);
+            this.updateVolume(volume,guiManager);
         }).bind(this);
 
         this.NRRDLoader.load(filePath, callBackFunction);
     }
 
-    updateVolume(volume) {
+    updateVolume(volume,guiManager) {
         this.volume = volume;
 
         this.texture = new THREE.DataTexture3D(this.volume.data, this.volume.xLength, this.volume.yLength, this.volume.zLength);
+        this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
+
+        let volLength= new THREE.Vector3(volume.xLength, volume.yLength, volume.zLength);
+        window.maxSlicesVolume = volLength.length();
+
+        //Set max slice value for new volume
+        guiManager.gui.__controllers[1].max(window.maxSlicesVolume);
+
 
         // TODO Fix that files need special treatments
         if (this.currentFileName == "stent") {
@@ -77,6 +85,7 @@ class VolumeManager {
 
         this.boundingBox.min.set(-this.volume.xLength / 2, -this.volume.yLength / 2, -this.volume.zLength / 2);
         this.boundingBox.max.set(this.volume.xLength / 2, this.volume.yLength / 2, this.volume.zLength / 2);
+
 
         this.proxyGeometryGenerator.setBoundingBox(this.boundingBox);
 

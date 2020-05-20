@@ -1,12 +1,13 @@
 import {GUI} from './libs/dat.gui.module.js';
 
 import {VolumeManager} from "./VolumeManager.js";
+import * as SHARED from "./Shared.js";
 
 class GUIManager {
     gui;
     volumeManager;
-    focplaneposValue;
     blurValue;
+    update;
 
     constructor() {
         if (GUIManager.exists) {
@@ -23,7 +24,7 @@ class GUIManager {
 
         let volumeParams = {
             volume: 'teapot',
-            focplanepos: this.focplaneposValue,
+            Focal_Plane_Distance: this.focplaneposValue,
             Blur: this.blurValue
         };
 
@@ -33,7 +34,7 @@ class GUIManager {
             ['stent', 'skull', 'aneurism', 'teapot']
         ).onChange((this.updateVolume).bind(this));
 
-        this.gui.add(volumeParams, 'focplanepos', 0, 200, 1).onChange((this.updateFocPlanePos).bind(this));
+        this.gui.add(volumeParams, 'Focal_Plane_Distance', 0, 512, 1).onChange((this.updateFocPlanePos).bind(this));
         this.gui.add(volumeParams, 'Blur', 0, 1, 0.01).onChange((this.updateBlur).bind(this));
 
         this.updateVolume(volumeParams.volume);
@@ -42,15 +43,18 @@ class GUIManager {
     }
 
     updateVolume(value) {
-        this.volumeManager.loadNRRDFile("./misc/models/nrrd/" + value + ".nrrd", value);
+        this.volumeManager.loadNRRDFile("./misc/models/nrrd/" + value + ".nrrd", value, this);
+        this.update = true;
     }
 
     updateBlur(value) {
        this.blurValue = value;
+       this.update = true;
     }
 
     updateFocPlanePos(value) {
-        this.focplaneposValue = value;
+        window.focal_plane_distance = value;
+        this.update = true;
     }
 
 

@@ -348,6 +348,8 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		volume.xLength = volume.dimensions[ 0 ];
 		volume.yLength = volume.dimensions[ 1 ];
 		volume.zLength = volume.dimensions[ 2 ];
+
+
 		// spacing
 		var spacingX = ( new Vector3( headerObject.vectors[ 0 ][ 0 ], headerObject.vectors[ 0 ][ 1 ],
 			headerObject.vectors[ 0 ][ 2 ] ) ).length();

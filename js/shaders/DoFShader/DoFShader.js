@@ -21,6 +21,7 @@ let DoFShader = {
         "depthCoord": {value: null},
         "distance": {value: null},
         "circleOfConf": {value: null},
+        "u_transfer": {value: null},
         "FRONT2BACK": {value: null}
     },
     vertexShader: null,

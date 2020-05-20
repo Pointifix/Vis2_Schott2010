@@ -1,17 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>three.js webgl - volume rendering example</title>
+    <title>Depth of Field Effects for Interactive Direct Volume Rendering</title>
     <meta charset="utf-8">
     <meta content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" name="viewport">
     <link href="main.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
-<div id="info">
-    <a href="https://threejs.org" rel="noopener" target="_blank">three.js</a> - Float volume render test (mip /
-    isosurface)
-</div>
 <div id="container"></div>
 <div id="inset"></div>
 <script type="module">
@@ -24,7 +20,7 @@
     import {ProxyGeometryGenerator} from "./js/ProxyGeometryGenerator.js";
     import {DoFShader} from "./js/shaders/DoFShader/DoFShader.js";
     import {VolumeShader} from "./js/shaders/VolumeShader/VolumeShader.js";
-    import * as CONSTANTS from "./js/Constants.js";
+    import * as SHARED from "./js/Shared.js";
 
     if (WEBGL.isWebGL2Available() === false) {
         document.body.appendChild(WEBGL.getWebGL2ErrorMessage());
@@ -48,7 +44,7 @@
     let b2fRenderTargets = new Array(2);
     let b2fCurrentRenderTarget = false;
 
-    let scenes = [CONSTANTS.MAX_SLICES_COUNT];
+    let scenes = [SHARED.MAX_SLICES_COUNT];
 
     let transferTextures;
 
@@ -59,7 +55,7 @@
 
     function init() {
         //Scenes
-        for (let i = 0; i < CONSTANTS.MAX_SLICES_COUNT; i++) {
+        for (let i = 0; i < SHARED.MAX_SLICES_COUNT; i++) {
             scenes[i] = new THREE.Scene();
         }
 
@@ -94,7 +90,8 @@
             fragmentShader: dofShader.fragmentShader,
             side: THREE.DoubleSide,
             transparent: true,
-            depthTest: false
+            depthTest: false,
+            blending: THREE.NoBlending
         });
 
         dofShaderMaterial.uniforms["u_screen_size"].value = new THREE.Vector2(window.innerWidth, window.innerHeight);
@@ -109,7 +106,8 @@
             fragmentShader: VolumeShader.fragmentShader,
             side: THREE.DoubleSide,
             transparent: true,
-            depthTest: false
+            depthTest: false,
+            blending: THREE.NoBlending
         });
 
         compositionMaterial.uniforms["u_screen_size"].value = new THREE.Vector2(window.innerWidth, window.innerHeight);
@@ -139,7 +137,7 @@
             gray: new THREE.TextureLoader().load('misc/textures/cm_gray.png', render)
         };
 
-        compositionMaterial.uniforms["u_transfer"].value = transferTextures.gray;
+        dofShaderMaterial.uniforms["u_transfer"].value = transferTextures.viridis;
 
         //Screen Quad
         quadCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
@@ -178,7 +176,8 @@
 
         if (!(proxyGeometryGenerator.box === undefined)) proxyGeometryGenerator.updateProxyGeometries(camera);
 
-        if (controls.update() || camera.zoom != camera.prevZoom) {
+        if (controls.update() || camera.zoom != camera.prevZoom || guiManager.update) {
+            guiManager.update = false;
             render();
             stats.update();
 
@@ -198,13 +197,13 @@
         renderer.setRenderTarget(null);
         renderer.clear();
 
-        dofShaderMaterial.uniforms["depthCoord"].value = guiManager.focplaneposValue;
+        dofShaderMaterial.uniforms["depthCoord"].value = proxyGeometryGenerator.focalPlaneIndex;
         dofShaderMaterial.uniforms["circleOfConf"].value = guiManager.blurValue;
 
         //f2b
+        dofShaderMaterial.uniforms["FRONT2BACK"].value = 1;
         for (let i = 0; i < proxyGeometryGenerator.focalPlaneIndex; i++) {
             dofShaderMaterial.uniforms["u_prev"].value = f2bRenderTargets[!f2bCurrentRenderTarget | 0].texture;
-            dofShaderMaterial.uniforms["FRONT2BACK"].value = 1;
 
             renderer.setRenderTarget(f2bRenderTargets[f2bCurrentRenderTarget | 0]);
 
@@ -213,9 +212,9 @@
         }
 
         //b2f
+        dofShaderMaterial.uniforms["FRONT2BACK"].value = 0;
         for (let i = proxyGeometryGenerator.sliceIndex; i >= proxyGeometryGenerator.focalPlaneIndex; i--) {
 
-            dofShaderMaterial.uniforms["FRONT2BACK"].value = 0;
             dofShaderMaterial.uniforms["u_prev"].value = b2fRenderTargets[!b2fCurrentRenderTarget | 0].texture;
 
             renderer.setRenderTarget(b2fRenderTargets[b2fCurrentRenderTarget | 0]);

@@ -4,7 +4,8 @@ uniform float circleOfConf;
 out vec2 Ct;
 out vec4 frag_pos;
 
-void main() {
+void main()
+{
     // CIRCLE OF CONFUSION
 	float newC = 2.0f * tan(radians(5.0f /2.0f)) * circleOfConf;
 	vec4 C = vec4(newC, newC, depthCoord, 1);
