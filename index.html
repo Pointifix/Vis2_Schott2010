@@ -62,10 +62,14 @@
         //Renderer
         container = document.getElementById("container");
         let canvas = document.createElement('canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
         let context = canvas.getContext('webgl2', {alpha: true, antialias: false});
+
         renderer = new THREE.WebGLRenderer({canvas: canvas, context: context, preserveDrawingBuffer: true});
-        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setPixelRatio(1.0);
         renderer.setSize(window.innerWidth, window.innerHeight);
+
         container.appendChild(renderer.domElement);
         renderer.autoClear = false;
 
@@ -137,11 +141,11 @@
             gray: new THREE.TextureLoader().load('misc/textures/cm_gray.png', render)
         };
 
-        dofShaderMaterial.uniforms["u_transfer"].value = transferTextures.viridis;
+        compositionMaterial.uniforms["u_transfer"].value = transferTextures.gray;
 
         //Screen Quad
-        quadCamera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-        quadMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), compositionMaterial );
+        quadCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+        quadMesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2), compositionMaterial);
 
         //Stats
         stats = new Stats();
@@ -154,11 +158,12 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         let aspect = window.innerWidth / window.innerHeight;
 
-        b2fRenderTargets[0] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
-        b2fRenderTargets[1] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
-
+        //Framebuffer
         f2bRenderTargets[0] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
         f2bRenderTargets[1] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+
+        b2fRenderTargets[0] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+        b2fRenderTargets[1] = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
 
         dofShaderMaterial.uniforms["u_screen_size"].value = new THREE.Vector2(window.innerWidth, window.innerHeight);
         compositionMaterial.uniforms["u_screen_size"].value = new THREE.Vector2(window.innerWidth, window.innerHeight);
@@ -176,7 +181,14 @@
 
         if (!(proxyGeometryGenerator.box === undefined)) proxyGeometryGenerator.updateProxyGeometries(camera);
 
-        if (controls.update() || camera.zoom != camera.prevZoom || guiManager.update) {
+        if (guiManager.update) {
+            compositionMaterial.uniforms["u_transfer"].value = transferTextures[guiManager.transfer];
+            dofShaderMaterial.uniforms["u_threshold"].value = guiManager.threshold;
+        }
+
+
+
+        if ((controls.update() || camera.zoom != camera.prevZoom || guiManager.update) && volumeManager.volume != null) {
             guiManager.update = false;
             render();
             stats.update();
@@ -197,12 +209,12 @@
         renderer.setRenderTarget(null);
         renderer.clear();
 
-        dofShaderMaterial.uniforms["depthCoord"].value = proxyGeometryGenerator.focalPlaneIndex;
-        dofShaderMaterial.uniforms["circleOfConf"].value = guiManager.blurValue;
+        dofShaderMaterial.uniforms["circleOfConf"].value = guiManager.blur;
 
         //f2b
-        dofShaderMaterial.uniforms["FRONT2BACK"].value = 1;
-        for (let i = 0; i < proxyGeometryGenerator.focalPlaneIndex; i++) {
+        dofShaderMaterial.uniforms["u_front_to_back"].value = true;
+        for (let i = 0; i < window.focal_plane_distance; i++) {
+            dofShaderMaterial.uniforms["u_distance"].value = Math.abs(window.focal_plane_distance - i);
             dofShaderMaterial.uniforms["u_prev"].value = f2bRenderTargets[!f2bCurrentRenderTarget | 0].texture;
 
             renderer.setRenderTarget(f2bRenderTargets[f2bCurrentRenderTarget | 0]);
@@ -212,9 +224,9 @@
         }
 
         //b2f
-        dofShaderMaterial.uniforms["FRONT2BACK"].value = 0;
-        for (let i = proxyGeometryGenerator.sliceIndex; i >= proxyGeometryGenerator.focalPlaneIndex; i--) {
-
+        dofShaderMaterial.uniforms["u_front_to_back"].value = false;
+        for (let i = proxyGeometryGenerator.sliceIndex; i >= window.focal_plane_distance; i--) {
+            dofShaderMaterial.uniforms["u_distance"].value = Math.abs(window.focal_plane_distance - i);
             dofShaderMaterial.uniforms["u_prev"].value = b2fRenderTargets[!b2fCurrentRenderTarget | 0].texture;
 
             renderer.setRenderTarget(b2fRenderTargets[b2fCurrentRenderTarget | 0]);
@@ -227,15 +239,15 @@
         compositionMaterial.uniforms["u_b2f"].value = b2fRenderTargets[!b2fCurrentRenderTarget | 0].texture;
         renderer.setRenderTarget(null);
 
-        let mesh = scenes[proxyGeometryGenerator.focalPlaneIndex].children[0];
-        scenes[proxyGeometryGenerator.focalPlaneIndex].remove(scenes[proxyGeometryGenerator.focalPlaneIndex].children[0]);
+        let mesh = scenes[window.focal_plane_distance].children[0];
+        scenes[window.focal_plane_distance].remove(scenes[window.focal_plane_distance].children[0]);
 
-        scenes[proxyGeometryGenerator.focalPlaneIndex].add(new THREE.Mesh(mesh.geometry, compositionMaterial));
+        scenes[window.focal_plane_distance].add(new THREE.Mesh(mesh.geometry, compositionMaterial));
 
         renderer.render(quadMesh, quadCamera);
 
-        scenes[proxyGeometryGenerator.focalPlaneIndex].remove(scenes[proxyGeometryGenerator.focalPlaneIndex].children[0]);
-        scenes[proxyGeometryGenerator.focalPlaneIndex].add(mesh);
+        scenes[window.focal_plane_distance].remove(scenes[window.focal_plane_distance].children[0]);
+        scenes[window.focal_plane_distance].add(mesh);
 
         stats.update();
     }

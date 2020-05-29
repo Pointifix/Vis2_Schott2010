@@ -56,13 +56,6 @@ class VolumeManager {
         this.texture = new THREE.DataTexture3D(this.volume.data, this.volume.xLength, this.volume.yLength, this.volume.zLength);
         this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
 
-        let volLength= new THREE.Vector3(volume.xLength, volume.yLength, volume.zLength);
-        window.maxSlicesVolume = volLength.length();
-
-        //Set max slice value for new volume
-        guiManager.gui.__controllers[1].max(window.maxSlicesVolume);
-
-
         // TODO Fix that files need special treatments
         if (this.currentFileName == "stent") {
             this.texture.format = THREE.RedFormat;
@@ -74,9 +67,17 @@ class VolumeManager {
         this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
         this.texture.unpackAlignment = 1;
 
+        this.controls.zoom0 = 2;
+        this.controls.reset();
         this.controls.target.set(0, 0, 0);
-        this.camera.position.set(0, 0,(new THREE.Vector3(this.volume.xLength, this.volume.yLength, this.volume.zLength)).length());
+
+        let diagonal = new THREE.Vector3(this.volume.xLength, this.volume.yLength, this.volume.zLength).length();
+
+        this.camera.position.set(0, 0, diagonal);
         this.camera.prevZoom = Number.MAX_VALUE;
+
+        let maxFocus = diagonal * window.sliceDistance;
+        guiManager.updateMaxFocus(maxFocus);
 
         this.volumeShaderMaterial.uniforms["u_volume"].value = this.texture;
         this.volumeShaderMaterial.uniforms["u_size"].value.set(this.volume.xLength, this.volume.yLength, this.volume.zLength);

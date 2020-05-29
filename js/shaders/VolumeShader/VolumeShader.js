@@ -16,7 +16,8 @@ let VolumeShader = {
     uniforms: {
         "u_screen_size": {value: new Vector2(1, 1)},
         "u_f2b": {value: null},
-        "u_b2f": {value: null}
+        "u_b2f": {value: null},
+        "u_transfer": {value: null}
     },
     vertexShader: null,
     fragmentShader: null,

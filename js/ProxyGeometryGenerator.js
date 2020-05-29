@@ -8,7 +8,6 @@ class ProxyGeometryGenerator {
     corners;
     edges;
 
-    focalPlaneIndex = 0;
     sliceIndex = 0;
 
     geometries = new Array(SHARED.MAX_SLICES_COUNT);
@@ -110,17 +109,8 @@ class ProxyGeometryGenerator {
 
         let sliceIndex = 0;
 
-        let cameraDistance = viewPlane.constant * (1.0 / camera.zoom);
-
-        let focalPlaneSet = false;
-
         do {
-            plane.constant--;
-
-            if (!focalPlaneSet && cameraDistance - window.focal_plane_distance > plane.constant) {
-                this.focalPlaneIndex = sliceIndex;
-                focalPlaneSet = true;
-            }
+            plane.constant -= window.sliceDistance;
 
             intersectionVertices = [];
 

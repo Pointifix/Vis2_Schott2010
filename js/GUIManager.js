@@ -1,12 +1,10 @@
 import {GUI} from './libs/dat.gui.module.js';
 
 import {VolumeManager} from "./VolumeManager.js";
-import * as SHARED from "./Shared.js";
 
 class GUIManager {
     gui;
     volumeManager;
-    blurValue;
     update;
 
     constructor() {
@@ -17,27 +15,38 @@ class GUIManager {
         GUIManager.exists = true;
 
         this.volumeManager = new VolumeManager(null, null, null);
-        this.focplaneposValue = 120;
-        this.blurValue = 0.5;
+        this.focus = 120;
+        this.blur = 0.5;
+        this.threshold = 0.15;
+        this.transfer = 'gray';
 
         this.gui = new GUI();
 
         let volumeParams = {
-            volume: 'teapot',
-            Focal_Plane_Distance: this.focplaneposValue,
-            Blur: this.blurValue
+            Volume: 'aneurism',
+            Transfer: this.transfer,
+            Focus: this.focus,
+            Blur: this.blur,
+            Threshold: this.threshold
         };
 
         this.gui.add(
             volumeParams,
-            'volume',
+            'Volume',
             ['stent', 'skull', 'aneurism', 'teapot']
         ).onChange((this.updateVolume).bind(this));
 
-        this.gui.add(volumeParams, 'Focal_Plane_Distance', 0, 512, 1).onChange((this.updateFocPlanePos).bind(this));
-        this.gui.add(volumeParams, 'Blur', 0, 1, 0.01).onChange((this.updateBlur).bind(this));
+        this.gui.add(
+            volumeParams,
+            'Transfer',
+            ['gray', 'viridis']
+        ).onChange((this.updateTransfer).bind(this));
 
-        this.updateVolume(volumeParams.volume);
+        this.gui.add(volumeParams, 'Focus', 0, 512, 1).onChange((this.updateFocus).bind(this));
+        this.gui.add(volumeParams, 'Blur', 0, 1, 0.01).onChange((this.updateBlur).bind(this));
+        this.gui.add(volumeParams, 'Threshold', 0, 1, 0.01).onChange((this.updateThreshold).bind(this));
+
+        this.updateVolume(volumeParams.Volume);
 
         return this;
     }
@@ -47,17 +56,35 @@ class GUIManager {
         this.update = true;
     }
 
+    updateTransfer(value) {
+        this.transfer = value;
+        this.update = true;
+    }
+
     updateBlur(value) {
-       this.blurValue = value;
+       this.blur = value;
        this.update = true;
     }
 
-    updateFocPlanePos(value) {
+    updateFocus(value) {
         window.focal_plane_distance = value;
         this.update = true;
     }
 
+    updateMaxFocus(maxValue) {
+        this.gui.__controllers.forEach(controller => {
+            if (controller.property === "Focus") {
+                controller.max(maxValue);
+                controller.setValue(maxValue / 2);
+                controller.updateDisplay();
+            }
+        });
+    }
 
+    updateThreshold(value) {
+        this.threshold = value;
+        this.update = true;
+    }
 }
 
 export {GUIManager};

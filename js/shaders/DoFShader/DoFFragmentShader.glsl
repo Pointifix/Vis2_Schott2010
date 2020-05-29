@@ -7,13 +7,13 @@ uniform vec3 u_size;
 uniform sampler2D u_prev;
 uniform vec2 u_screen_size;
 
-uniform int FRONT2BACK;
-
 uniform sampler2D u_transfer;
 
-in vec4 frag_pos;
+uniform bool u_front_to_back;
+uniform float u_threshold;
 
-in vec2 Ct;
+in vec4 frag_pos;
+in vec2 C_t;
 
 vec4 blur9(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
     vec4 color = vec4(0.0);
@@ -33,21 +33,16 @@ void main()
     vec2 texCoord2 = (gl_FragCoord.xy / u_screen_size);
     vec4 blurred = vec4(0.0);
 
-    vec2 Ct2 = Ct / 2.0;
-
-    blurred += blur9(u_prev, texCoord2, u_screen_size, vec2(0, Ct.y * u_screen_size.y));
-    blurred += blur9(u_prev, texCoord2, u_screen_size, vec2(Ct.x * u_screen_size.x, 0));
+    blurred += blur9(u_prev, texCoord2, u_screen_size, vec2(0, C_t.x * u_screen_size.y));
+    blurred += blur9(u_prev, texCoord2, u_screen_size, vec2(C_t.y * u_screen_size.x, 0));
     blurred = blurred / 2.0;
 
     vec4 source = vec4(0.0);
-    if (volume_sample.r > 0.15)
-    {
-        source = vec4(vec3(texture(u_transfer, vec2(volume_sample.r, 0.0))), volume_sample.r);
-    }
+    if (volume_sample.r > u_threshold) source = vec4(volume_sample.r) * 0.1f;
 
     vec4 outColor = vec4(0.0);
 
-    if (FRONT2BACK != 1)
+    if (u_front_to_back)
     {
         outColor = source + blurred * (1.0 - source.a);
     }

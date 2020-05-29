@@ -18,11 +18,11 @@ let DoFShader = {
         "u_screen_size": {value: new Vector2(1, 1)},
         "u_volume": {value: null},
         "u_prev": {value: null},
-        "depthCoord": {value: null},
-        "distance": {value: null},
+        "u_distance": {value: null},
         "circleOfConf": {value: null},
         "u_transfer": {value: null},
-        "FRONT2BACK": {value: null}
+        "u_front_to_back": {value: null},
+        "u_threshold": {value: null}
     },
     vertexShader: null,
     fragmentShader: null,
