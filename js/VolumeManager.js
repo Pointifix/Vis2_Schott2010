@@ -56,12 +56,11 @@ class VolumeManager {
         this.texture = new THREE.DataTexture3D(this.volume.data, this.volume.xLength, this.volume.yLength, this.volume.zLength);
         this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
 
-        // TODO Fix that files need special treatments
-        if (this.currentFileName == "stent") {
+        if (this.volume.header["encoding"] === "raw") {
+            this.texture.format = THREE.RedFormat;
+        } else if (this.volume.header["encoding"] === "gzip") {
             this.texture.format = THREE.RedFormat;
             this.texture.type = THREE.FloatType;
-        } else {
-            this.texture.format = THREE.RedFormat;
         }
 
         this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;

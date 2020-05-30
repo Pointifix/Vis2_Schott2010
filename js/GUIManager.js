@@ -23,7 +23,7 @@ class GUIManager {
         this.gui = new GUI();
 
         let volumeParams = {
-            Volume: 'aneurism',
+            Volume: 'Skull',
             Transfer: this.transfer,
             Focus: this.focus,
             Blur: this.blur,
@@ -33,7 +33,12 @@ class GUIManager {
         this.gui.add(
             volumeParams,
             'Volume',
-            ['stent', 'skull', 'aneurism', 'teapot']
+            ['Aneurism',
+             'BostonTeapot',
+             'Engine',
+             'Skull',
+             'Stent',
+             'Lobster']
         ).onChange((this.updateVolume).bind(this));
 
         this.gui.add(

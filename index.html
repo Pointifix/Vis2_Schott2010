@@ -173,6 +173,8 @@
         camera.left = -frustumHeight * aspect / 2;
         camera.right = frustumHeight * aspect / 2;
 
+        guiManager.update = true;
+
         camera.updateProjectionMatrix();
     }
 
@@ -185,8 +187,6 @@
             compositionMaterial.uniforms["u_transfer"].value = transferTextures[guiManager.transfer];
             dofShaderMaterial.uniforms["u_threshold"].value = guiManager.threshold;
         }
-
-
 
         if ((controls.update() || camera.zoom != camera.prevZoom || guiManager.update) && volumeManager.volume != null) {
             guiManager.update = false;
@@ -213,7 +213,7 @@
 
         //f2b
         dofShaderMaterial.uniforms["u_front_to_back"].value = true;
-        for (let i = 0; i < window.focal_plane_distance; i++) {
+        for (let i = 0; i < Math.min(window.focal_plane_distance, proxyGeometryGenerator.sliceIndex); i++) {
             dofShaderMaterial.uniforms["u_distance"].value = Math.abs(window.focal_plane_distance - i);
             dofShaderMaterial.uniforms["u_prev"].value = f2bRenderTargets[!f2bCurrentRenderTarget | 0].texture;
 
