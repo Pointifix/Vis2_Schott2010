@@ -44,7 +44,7 @@ class GUIManager {
         this.gui.add(
             volumeParams,
             'Transfer',
-            ['gray', 'viridis']
+            ['gray', 'viridis', 'parula', 'jet', 'hsv', 'hot', 'cool', 'spring', 'summer', 'autumn', 'winter', 'bone', 'copper', 'pink', 'lines', 'colorcube', 'prism', 'flag']
         ).onChange((this.updateTransfer).bind(this));
 
         this.gui.add(volumeParams, 'Focus', 0, 512, 1).onChange((this.updateFocus).bind(this));

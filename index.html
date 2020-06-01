@@ -137,8 +137,24 @@
 
         //Transfer Functions
         transferTextures = {
+            gray: new THREE.TextureLoader().load('misc/textures/cm_gray.png', render),
             viridis: new THREE.TextureLoader().load('misc/textures/cm_viridis.png', render),
-            gray: new THREE.TextureLoader().load('misc/textures/cm_gray.png', render)
+            parula: new THREE.TextureLoader().load('misc/textures/cm_parula.png', render),
+            jet: new THREE.TextureLoader().load('misc/textures/cm_jet.png', render),
+            hsv: new THREE.TextureLoader().load('misc/textures/cm_hsv.png', render),
+            hot: new THREE.TextureLoader().load('misc/textures/cm_hot.png', render),
+            cool: new THREE.TextureLoader().load('misc/textures/cm_cool.png', render),
+            spring: new THREE.TextureLoader().load('misc/textures/cm_spring.png', render),
+            summer: new THREE.TextureLoader().load('misc/textures/cm_summer.png', render),
+            autumn: new THREE.TextureLoader().load('misc/textures/cm_autumn.png', render),
+            winter: new THREE.TextureLoader().load('misc/textures/cm_winter.png', render),
+            bone: new THREE.TextureLoader().load('misc/textures/cm_bone.png', render),
+            copper: new THREE.TextureLoader().load('misc/textures/cm_copper.png', render),
+            pink: new THREE.TextureLoader().load('misc/textures/cm_pink.png', render),
+            lines: new THREE.TextureLoader().load('misc/textures/cm_lines.png', render),
+            colorcube: new THREE.TextureLoader().load('misc/textures/cm_colorcube.png', render),
+            prism: new THREE.TextureLoader().load('misc/textures/cm_prism.png', render),
+            flag: new THREE.TextureLoader().load('misc/textures/cm_flag.png', render)
         };
 
         compositionMaterial.uniforms["u_transfer"].value = transferTextures.gray;
