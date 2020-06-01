@@ -53,6 +53,8 @@ class VolumeManager {
     updateVolume(volume,guiManager) {
         this.volume = volume;
 
+        console.log(this.volume);
+
         this.texture = new THREE.DataTexture3D(this.volume.data, this.volume.xLength, this.volume.yLength, this.volume.zLength);
         this.texture.minFilter = this.texture.magFilter = THREE.LinearFilter;
 
@@ -80,6 +82,7 @@ class VolumeManager {
 
         this.volumeShaderMaterial.uniforms["u_volume"].value = this.texture;
         this.volumeShaderMaterial.uniforms["u_size"].value.set(this.volume.xLength, this.volume.yLength, this.volume.zLength);
+        this.volumeShaderMaterial.uniforms["u_matrix"].value = this.volume.matrix;
 
         this.volumeShaderMaterial.needsUpdate = true;
 

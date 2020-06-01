@@ -17,6 +17,7 @@ let DoFShader = {
         "u_size": {value: new Vector3(1, 1, 1)},
         "u_screen_size": {value: new Vector2(1, 1)},
         "u_volume": {value: null},
+        "u_matrix": {value: null},
         "u_prev": {value: null},
         "u_distance": {value: null},
         "circleOfConf": {value: null},

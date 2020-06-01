@@ -194,21 +194,7 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			if ( ! headerObject.vectors ) {
 
 				//if no space direction is set, let's use the identity
-				headerObject.vectors = [ new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ) ];
-				//apply spacing if defined
-				if ( headerObject.spacings ) {
-
-					for ( i = 0; i <= 2; i ++ ) {
-
-						if ( ! isNaN( headerObject.spacings[ i ] ) ) {
-
-							headerObject.vectors[ i ].multiplyScalar( headerObject.spacings[ i ] );
-
-						}
-
-					}
-
-				}
+				headerObject.vectors = [ [ 1, 0, 0 ], [ 0, 1, 0 ], [ 0, 0, 1 ] ];
 
 			}
 
@@ -343,13 +329,6 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		volume.windowLow = min;
 		volume.windowHigh = max;
 
-		// get the image dimensions
-		volume.dimensions = [ headerObject.sizes[ 0 ], headerObject.sizes[ 1 ], headerObject.sizes[ 2 ] ];
-		volume.xLength = volume.dimensions[ 0 ];
-		volume.yLength = volume.dimensions[ 1 ];
-		volume.zLength = volume.dimensions[ 2 ];
-
-
 		// spacing
 		var spacingX = ( new Vector3( headerObject.vectors[ 0 ][ 0 ], headerObject.vectors[ 0 ][ 1 ],
 			headerObject.vectors[ 0 ][ 2 ] ) ).length();
@@ -378,7 +357,6 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-
 		if ( ! headerObject.vectors ) {
 
 			volume.matrix.set(
@@ -399,6 +377,13 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
+		// get the image dimensions
+		var dimensions = (new Vector3(headerObject.sizes[ 0 ], headerObject.sizes[ 1 ], headerObject.sizes[ 2 ])).applyMatrix4(volume.matrix);
+
+		volume.dimensions = [ Math.abs(dimensions.x), Math.abs(dimensions.y), Math.abs(dimensions.z) ];
+		volume.xLength = volume.dimensions[ 0 ];
+		volume.yLength = volume.dimensions[ 1 ];
+		volume.zLength = volume.dimensions[ 2 ];
 
 		volume.inverseMatrix = new Matrix4();
 		volume.inverseMatrix.getInverse( volume.matrix );
@@ -566,7 +551,6 @@ NRRDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				var _i, _len, _results;
 				_results = [];
 				for ( _i = 0, _len = parts.length; _i < _len; _i ++ ) {
-
 					v = parts[ _i ];
 					_results.push( ( function () {
 

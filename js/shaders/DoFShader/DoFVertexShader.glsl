@@ -4,6 +4,8 @@ uniform float circleOfConf;
 out vec2 C_t;
 out vec4 frag_pos;
 
+uniform mat4 u_matrix;
+
 void main()
 {
 	//Computation as in the paper - Equation 9-11 and pseudo code
@@ -20,7 +22,7 @@ void main()
 	C = transProjMatrix * C;
 	C_t = vec2(C.x / C.w, C.y / C.w);
 
-	frag_pos = modelMatrix * vec4(position, 1.0);
+	frag_pos = modelMatrix * u_matrix * vec4(position, 1.0);
 
 	vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
 	gl_Position = projectionMatrix * modelViewPosition;
