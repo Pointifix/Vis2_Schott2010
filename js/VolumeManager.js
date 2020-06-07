@@ -3,6 +3,11 @@ import * as THREE from "../build/three.module.js";
 import {NRRDLoader} from './loaders/NRRDLoader.js';
 import {ProxyGeometryGenerator} from "./ProxyGeometryGenerator.js";
 
+/**
+ * @author David Ammer
+ * @author Simon Pointner
+ * @description Manages the volume
+ */
 class VolumeManager {
     NRRDLoader;
     volume;
@@ -41,9 +46,9 @@ class VolumeManager {
     }
 
     /**
-     * @param {String} filePath
-     * @param {String} file
-     * @param guiManager
+     * @param {String} filePath - path of the nrrd-file
+     * @param {String} file - filename
+     * @param {GUIManager} guiManager - Manages the gui
      * @description Load new 3D-Volume
      */
     loadNRRDFile(filePath, file, guiManager) {
@@ -57,9 +62,9 @@ class VolumeManager {
     }
 
     /**
-     * @param  volume
-     * @param guiManager
-     * @description  update the volume
+     * @param {Object} volume - the volume file from nrrd file
+     * @param {GUIManager} guiManager - manages the gui
+     * @description update the volume
      */
     updateVolume(volume,guiManager) {
         this.volume = volume;

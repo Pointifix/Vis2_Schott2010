@@ -2,7 +2,12 @@ import * as THREE from '../build/three.module.js';
 
 import * as SHARED from "./Shared.js";
 
-//https://developer.nvidia.com/gpugems/gpugems/part-vi-beyond-triangles/chapter-39-volume-rendering-techniques
+/**
+ * @author David Ammer
+ * @author Simon Pointner
+ * @description Generates the Proxy-Geometry / https://developer.nvidia.com/gpugems/gpugems/part-vi-beyond-triangles/chapter-39-volume-rendering-techniques
+ */
+
 class ProxyGeometryGenerator {
     box;
     corners;
@@ -31,7 +36,7 @@ class ProxyGeometryGenerator {
     }
 
     /**
-     * @param  box
+     * @param{THREE.Box3} box - the bounding box
      * @description Update bounding box.
      */
     setBoundingBox(box) {
@@ -79,9 +84,9 @@ class ProxyGeometryGenerator {
 
     /**
      * Returns the intersection point of a plane/line intersection
-     * @param plane
-     * @param line
-     * @param vertices
+     * @param {THREE.Plane}plane - plane for slice
+     * @param {THREE.Line3}line - intersection  line
+     * @param {THREE.Vector3}vertices - vertices who intersect
      * @returns {boolean}
      */
     calcIntersection(plane, line, vertices) {
@@ -93,7 +98,7 @@ class ProxyGeometryGenerator {
 
     /**
      * Calculates the proxy geometries created by intersection view aligned slices with the volume bounding box
-     * @param camera
+     * @param {THREE.OrthographicCamera} camera - the orthographic camera
      * @returns {Array}
      */
     updateProxyGeometries(camera) {
@@ -153,7 +158,7 @@ class ProxyGeometryGenerator {
     /**
      * @description  Calculates the centroid of intersectionVertices, sorts the intersection Vertices according in ascending order of the angle
      * to the centroid, and adds the centroid at the end of intersectionVertices
-     * @param intersectionVertices
+     * @param{Array} intersectionVertices - intersection vertices
      */
     sortPolygonEdges(intersectionVertices) {
         let centroid = new THREE.Vector3(0, 0, 0);

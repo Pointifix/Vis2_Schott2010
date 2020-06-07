@@ -1,0 +1,2869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>
+      Global - Documentation
+  </title>
+
+  <link href="https://www.braintreepayments.com/images/favicon-ccda0b14.png" rel="icon" type="image/png">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+  <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+  <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+  
+
+  
+
+  <!-- start Mixpanel -->
+  <script type="text/javascript">(function(e,a){if(!a.__SV){var b=window;try{var c,l,i,j=b.location,g=j.hash;c=function(a,b){return(l=a.match(RegExp(b+"=([^&]*)")))?l[1]:null};g&&c(g,"state")&&(i=JSON.parse(decodeURIComponent(c(g,"state"))),"mpeditor"===i.action&&(b.sessionStorage.setItem("_mpcehash",g),history.replaceState(i.desiredHash||"",e.title,j.pathname+j.search)))}catch(m){}var k,h;window.mixpanel=a;a._i=[];a.init=function(b,c,f){function e(b,a){var c=a.split(".");2==c.length&&(b=b[c[0]],a=c[1]);b[a]=function(){b.push([a].concat(Array.prototype.slice.call(arguments,
+  0)))}}var d=a;"undefined"!==typeof f?d=a[f]=[]:f="mixpanel";d.people=d.people||[];d.toString=function(b){var a="mixpanel";"mixpanel"!==f&&(a+="."+f);b||(a+=" (stub)");return a};d.people.toString=function(){return d.toString(1)+".people (stub)"};k="disable time_event track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config reset people.set people.set_once people.increment people.append people.union people.track_charge people.clear_charges people.delete_user".split(" ");
+  for(h=0;h<k.length;h++)e(d,k[h]);a._i.push([b,c,f])};a.__SV=1.2;b=e.createElement("script");b.type="text/javascript";b.async=!0;b.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===e.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";c=e.getElementsByTagName("script")[0];c.parentNode.insertBefore(b,c)}})(document,window.mixpanel||[]);
+  mixpanel.init("1919205b2da72e4da3b9b6639b444d59");</script>
+  <!-- end Mixpanel -->
+</head>
+
+<body>
+  <svg style="display: none;">
+    <defs>
+      <symbol id="linkIcon" fill="#706d77" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 0h24v24H0z" fill="none"/>
+          <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+  <label for="nav-trigger" class="navicon-button x">
+    <div class="navicon"></div>
+  </label>
+
+  <label for="nav-trigger" class="overlay"></label>
+
+  <div class="top-nav-wrapper">
+    <ul>
+      <li >
+        <a href="index.html">
+          
+            <svg fill="#6D6D6D" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+              <path d="M0 0h24v24H0z" fill="none"/>
+            </svg>
+          
+          
+        </a>
+      </li>
+
+      
+
+    </ul>
+  </div>
+
+  <nav>
+    <h3 class="reference-title">
+      Braintree SDK Client Reference
+    </h3>
+
+    
+
+    <h3>Classes</h3><ul><li id="GUIManager-nav"><a href="GUIManager.html">GUIManager</a><ul class='methods'><li data-type="method" id="GUIManager-updateBlur-nav"><a href="GUIManager.html#updateBlur">updateBlur</a></li><li data-type="method" id="GUIManager-updateBlur-nav"><a href="GUIManager.html#updateBlur">updateBlur</a></li><li data-type="method" id="GUIManager-updateFocus-nav"><a href="GUIManager.html#updateFocus">updateFocus</a></li><li data-type="method" id="GUIManager-updateFocus-nav"><a href="GUIManager.html#updateFocus">updateFocus</a></li><li data-type="method" id="GUIManager-updateMaxFocus-nav"><a href="GUIManager.html#updateMaxFocus">updateMaxFocus</a></li><li data-type="method" id="GUIManager-updateMaxFocus-nav"><a href="GUIManager.html#updateMaxFocus">updateMaxFocus</a></li><li data-type="method" id="GUIManager-updateThreshold-nav"><a href="GUIManager.html#updateThreshold">updateThreshold</a></li><li data-type="method" id="GUIManager-updateThreshold-nav"><a href="GUIManager.html#updateThreshold">updateThreshold</a></li><li data-type="method" id="GUIManager-updateTransfer-nav"><a href="GUIManager.html#updateTransfer">updateTransfer</a></li><li data-type="method" id="GUIManager-updateTransfer-nav"><a href="GUIManager.html#updateTransfer">updateTransfer</a></li><li data-type="method" id="GUIManager-updateVolume-nav"><a href="GUIManager.html#updateVolume">updateVolume</a></li><li data-type="method" id="GUIManager-updateVolume-nav"><a href="GUIManager.html#updateVolume">updateVolume</a></li></ul></li><li id="ProxyGeometryGenerator-nav"><a href="ProxyGeometryGenerator.html">ProxyGeometryGenerator</a><ul class='methods'><li data-type="method" id="ProxyGeometryGenerator-calcIntersection-nav"><a href="ProxyGeometryGenerator.html#calcIntersection">calcIntersection</a></li><li data-type="method" id="ProxyGeometryGenerator-calcIntersection-nav"><a href="ProxyGeometryGenerator.html#calcIntersection">calcIntersection</a></li><li data-type="method" id="ProxyGeometryGenerator-setBoundingBox-nav"><a href="ProxyGeometryGenerator.html#setBoundingBox">setBoundingBox</a></li><li data-type="method" id="ProxyGeometryGenerator-setBoundingBox-nav"><a href="ProxyGeometryGenerator.html#setBoundingBox">setBoundingBox</a></li><li data-type="method" id="ProxyGeometryGenerator-sortPolygonEdges-nav"><a href="ProxyGeometryGenerator.html#sortPolygonEdges">sortPolygonEdges</a></li><li data-type="method" id="ProxyGeometryGenerator-sortPolygonEdges-nav"><a href="ProxyGeometryGenerator.html#sortPolygonEdges">sortPolygonEdges</a></li><li data-type="method" id="ProxyGeometryGenerator-updateProxyGeometries-nav"><a href="ProxyGeometryGenerator.html#updateProxyGeometries">updateProxyGeometries</a></li><li data-type="method" id="ProxyGeometryGenerator-updateProxyGeometries-nav"><a href="ProxyGeometryGenerator.html#updateProxyGeometries">updateProxyGeometries</a></li></ul></li><li id="VolumeManager-nav"><a href="VolumeManager.html">VolumeManager</a><ul class='methods'><li data-type="method" id="VolumeManager-loadNRRDFile-nav"><a href="VolumeManager.html#loadNRRDFile">loadNRRDFile</a></li><li data-type="method" id="VolumeManager-loadNRRDFile-nav"><a href="VolumeManager.html#loadNRRDFile">loadNRRDFile</a></li><li data-type="method" id="VolumeManager-updateVolume-nav"><a href="VolumeManager.html#updateVolume">updateVolume</a></li><li data-type="method" id="VolumeManager-updateVolume-nav"><a href="VolumeManager.html#updateVolume">updateVolume</a></li></ul></li></ul><h3 id="global-nav">Global</h3><ul><li><a href="global.html#axis">axis</a></li><li><a href="global.html#canvas">canvas</a></li><li><a href="global.html#canvasBuffer">canvasBuffer</a></li><li><a href="global.html#ctx">ctx</a></li><li><a href="global.html#ctxBuffer">ctxBuffer</a></li><li><a href="global.html#data">data</a></li><li><a href="global.html#geometryNeedsUpdate">geometryNeedsUpdate</a></li><li><a href="global.html#index">index</a></li><li><a href="global.html#inverseMatrix">inverseMatrix</a></li><li><a href="global.html#lowerThreshold">lowerThreshold</a></li><li><a href="global.html#matrix">matrix</a></li><li><a href="global.html#mesh">mesh</a></li><li><a href="global.html#offset">offset</a></li><li><a href="global.html#sliceList">sliceList</a></li><li><a href="global.html#spacing">spacing</a></li><li><a href="global.html#upperThreshold">upperThreshold</a></li><li><a href="global.html#volume">volume</a></li><li><a href="global.html#xLength">xLength</a></li><li><a href="global.html#yLength">yLength</a></li><li><a href="global.html#zLength">zLength</a></li></ul>
+  </nav>
+
+  <div id="main">
+    
+      <h1 class="page-title">
+        Global
+      </h1>
+    
+
+    
+
+<section>
+  <header>
+    
+      <h2>
+        
+        
+        
+      </h2>
+
+      
+    
+  </header>
+
+  <article>
+    <div class="container-overview">
+      
+        
+
+        
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+        
+      
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+
+<h4 class="name" id="axis">
+  <span class="type-signature"></span>axis<span class="type-signature"> :String</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The normal axis
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line45">line 45</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="axis">
+  <span class="type-signature"></span>axis<span class="type-signature"> :String</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The normal axis
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line45">line 45</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="canvas">
+  <span class="type-signature"></span>canvas<span class="type-signature"> :HTMLCanvasElement</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The final canvas used for the texture
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line50">line 50</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="canvas">
+  <span class="type-signature"></span>canvas<span class="type-signature"> :HTMLCanvasElement</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The final canvas used for the texture
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line50">line 50</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="canvasBuffer">
+  <span class="type-signature"></span>canvasBuffer<span class="type-signature"> :HTMLCanvasElement</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The intermediary canvas used to paint the data
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line57">line 57</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="canvasBuffer">
+  <span class="type-signature"></span>canvasBuffer<span class="type-signature"> :HTMLCanvasElement</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The intermediary canvas used to paint the data
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line57">line 57</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="ctx">
+  <span class="type-signature"></span>ctx<span class="type-signature"> :CanvasRenderingContext2D</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Context of the canvas
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line53">line 53</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="ctx">
+  <span class="type-signature"></span>ctx<span class="type-signature"> :CanvasRenderingContext2D</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Context of the canvas
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line53">line 53</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="ctxBuffer">
+  <span class="type-signature"></span>ctxBuffer<span class="type-signature"> :CanvasRenderingContext2D</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Context of the canvas buffer
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line60">line 60</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="ctxBuffer">
+  <span class="type-signature"></span>ctxBuffer<span class="type-signature"> :CanvasRenderingContext2D</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Context of the canvas buffer
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line60">line 60</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="data">
+  <span class="type-signature"></span>data<span class="type-signature"> :TypedArray</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Data of the volume
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line38">line 38</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="data">
+  <span class="type-signature"></span>data<span class="type-signature"> :TypedArray</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Data of the volume
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line38">line 38</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="geometryNeedsUpdate">
+  <span class="type-signature"></span>geometryNeedsUpdate<span class="type-signature"> :Boolean</span>
+</h4>
+
+
+
+
+  <div class="description">
+    If set to true, updateGeometry will be triggered at the next repaint
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line76">line 76</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="geometryNeedsUpdate">
+  <span class="type-signature"></span>geometryNeedsUpdate<span class="type-signature"> :Boolean</span>
+</h4>
+
+
+
+
+  <div class="description">
+    If set to true, updateGeometry will be triggered at the next repaint
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line76">line 76</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="index">
+  <span class="type-signature"></span>index<span class="type-signature"> :Number</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The index of the slice, if changed, will automatically call updateGeometry at the next repaint
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line27">line 27</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="index">
+  <span class="type-signature"></span>index<span class="type-signature"> :Number</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The index of the slice, if changed, will automatically call updateGeometry at the next repaint
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line27">line 27</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="inverseMatrix">
+  <span class="type-signature"></span>inverseMatrix<span class="type-signature"> :Martrix3</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The RAS to IJK matrix
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line138">line 138</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="inverseMatrix">
+  <span class="type-signature"></span>inverseMatrix<span class="type-signature"> :Martrix3</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The RAS to IJK matrix
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line138">line 138</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="lowerThreshold">
+  <span class="type-signature"></span>lowerThreshold<span class="type-signature"> :number</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The voxels with values under this threshold won't appear in the slices.                     If changed, geometryNeedsUpdate is automatically set to true on all the slices associated to this volume
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line141">line 141</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="lowerThreshold">
+  <span class="type-signature"></span>lowerThreshold<span class="type-signature"> :number</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The voxels with values under this threshold won't appear in the slices.                     If changed, geometryNeedsUpdate is automatically set to true on all the slices associated to this volume
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line141">line 141</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="matrix">
+  <span class="type-signature"></span>matrix<span class="type-signature"> :Martrix3</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The IJK to RAS matrix
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line133">line 133</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="matrix">
+  <span class="type-signature"></span>matrix<span class="type-signature"> :Martrix3</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The IJK to RAS matrix
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line133">line 133</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="mesh">
+  <span class="type-signature"></span>mesh<span class="type-signature"> :Mesh</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The mesh ready to get used in the scene
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line71">line 71</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="mesh">
+  <span class="type-signature"></span>mesh<span class="type-signature"> :Mesh</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The mesh ready to get used in the scene
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line71">line 71</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="offset">
+  <span class="type-signature"></span>offset<span class="type-signature"> :Array</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Offset of the volume in the RAS coordinate system
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line129">line 129</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="offset">
+  <span class="type-signature"></span>offset<span class="type-signature"> :Array</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Offset of the volume in the RAS coordinate system
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line129">line 129</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="sliceList">
+  <span class="type-signature"></span>sliceList<span class="type-signature"> :Array</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The list of all the slices associated to this volume
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line187">line 187</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="sliceList">
+  <span class="type-signature"></span>sliceList<span class="type-signature"> :Array</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The list of all the slices associated to this volume
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line187">line 187</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="spacing">
+  <span class="type-signature"></span>spacing<span class="type-signature"> :Array</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Spacing to apply to the volume from IJK to RAS coordinate system
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line125">line 125</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="spacing">
+  <span class="type-signature"></span>spacing<span class="type-signature"> :Array</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Spacing to apply to the volume from IJK to RAS coordinate system
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line125">line 125</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="upperThreshold">
+  <span class="type-signature"></span>upperThreshold<span class="type-signature"> :number</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The voxels with values over this threshold won't appear in the slices.                     If changed, geometryNeedsUpdate is automatically set to true on all the slices associated to this volume
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line163">line 163</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="upperThreshold">
+  <span class="type-signature"></span>upperThreshold<span class="type-signature"> :number</span>
+</h4>
+
+
+
+
+  <div class="description">
+    The voxels with values over this threshold won't appear in the slices.                     If changed, geometryNeedsUpdate is automatically set to true on all the slices associated to this volume
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line163">line 163</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="volume">
+  <span class="type-signature"></span>volume<span class="type-signature"> :<a href="Volume.html">Volume</a></span>
+</h4>
+
+
+
+
+  <div class="description">
+    The associated volume
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line23">line 23</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="volume">
+  <span class="type-signature"></span>volume<span class="type-signature"> :<a href="Volume.html">Volume</a></span>
+</h4>
+
+
+
+
+  <div class="description">
+    The associated volume
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_VolumeSlice.js.html">misc/VolumeSlice.js</a>, <a href="misc_VolumeSlice.js.html#line23">line 23</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="xLength">
+  <span class="type-signature"></span>xLength<span class="type-signature"> :number</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Width of the volume in the IJK coordinate system
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line25">line 25</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="xLength">
+  <span class="type-signature"></span>xLength<span class="type-signature"> :number</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Width of the volume in the IJK coordinate system
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line25">line 25</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="yLength">
+  <span class="type-signature"></span>yLength<span class="type-signature"> :number</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Height of the volume in the IJK coordinate system
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line29">line 29</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="yLength">
+  <span class="type-signature"></span>yLength<span class="type-signature"> :number</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Height of the volume in the IJK coordinate system
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line29">line 29</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="zLength">
+  <span class="type-signature"></span>zLength<span class="type-signature"> :number</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Depth of the volume in the IJK coordinate system
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line33">line 33</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+            
+
+<h4 class="name" id="zLength">
+  <span class="type-signature"></span>zLength<span class="type-signature"> :number</span>
+</h4>
+
+
+
+
+  <div class="description">
+    Depth of the volume in the IJK coordinate system
+  </div>
+
+
+
+
+<dl class="details">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source">
+      <ul class="dummy">
+        <li>
+          <a href="misc_Volume.js.html">misc/Volume.js</a>, <a href="misc_Volume.js.html#line33">line 33</a>
+        </li>
+      </ul>
+    </dd>
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+
+
+
+
+          
+        
+    
+
+    
+
+    
+
+    
+  </article>
+</section>
+
+
+
+
+  </div>
+
+  <br class="clear">
+
+  <footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a>
+  </footer>
+
+  <script src="scripts/linenumber.js"></script>
+  <script src="scripts/pagelocation.js"></script>
+
+  
+
+</body>
+</html>

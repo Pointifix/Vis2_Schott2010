@@ -1,0 +1,30 @@
+{
+    "tags": {
+        "allowUnknownTags": true,
+        "dictionaries": ["jsdoc"]
+    },
+    "source": {
+        "include": ["./","js","index.html"],
+        "includePattern": ".+\\.js$",
+        "excludePattern": "(node_modules|docs|WebGL.js|controls|libs|loaders|build|misc)"
+    },
+    "plugins": [],
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": true,
+        "systemName": "Depth of Field Effects for Interactive Direct Volume Rendering",
+        "footer": "David Ammer, Simon Pointner",
+        "copyright": "2020",
+        "navType": "horizontal",
+        "theme": "spacelab",
+        "linenums": true,
+        "collapseSymbols": true,
+        "inverseNav": false
+    },
+    "opts": {
+        "template": "../template",
+        "encoding": "utf8",
+        "destination": "docs/js",
+        "recurse": true
+    }
+}

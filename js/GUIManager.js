@@ -2,6 +2,11 @@ import {GUI} from './libs/dat.gui.module.js';
 
 import {VolumeManager} from "./VolumeManager.js";
 
+/**
+ * @author David Ammer
+ * @author Simon Pointner
+ * @description Updates and manages the gui
+ */
 class GUIManager {
     gui;
     volumeManager;
@@ -57,7 +62,7 @@ class GUIManager {
     }
 
     /**
-     * @param {string} value
+     * @param {string} value - path of volume
      * @description If user changed 3D-Volume, load the new Volume.
      */
     updateVolume(value) {
@@ -66,7 +71,7 @@ class GUIManager {
     }
 
     /**
-     * @param {number} value
+     * @param {number} value - new value
      * @description update transfer-value.
      */
     updateTransfer(value) {
@@ -75,7 +80,7 @@ class GUIManager {
     }
 
     /**
-     * @param {number} value
+     * @param {number} value - new blur value
      * @description update blue-value.
      */
     updateBlur(value) {
@@ -84,7 +89,7 @@ class GUIManager {
     }
 
     /**
-     * @param {number} value
+     * @param {number} value - new focus plane distance
      * @description Update distance of focal plane.
      */
     updateFocus(value) {
@@ -94,7 +99,7 @@ class GUIManager {
 
 
     /**
-     * @param {number} maxValue
+     * @param {number} maxValue - maximum value for slices
      * @description Set maxValue for focalplane slider and default value to the half of max-value
      */
     updateMaxFocus(maxValue) {
@@ -108,7 +113,7 @@ class GUIManager {
     }
 
     /**
-     * @param {number} value
+     * @param {number} value - new value for threshold
      * @description Update threshold.
      */
     updateThreshold(value) {

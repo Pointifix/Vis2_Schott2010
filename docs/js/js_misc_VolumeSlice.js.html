@@ -1,0 +1,343 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>
+      js/misc/VolumeSlice.js - Documentation
+  </title>
+
+  <link href="https://www.braintreepayments.com/images/favicon-ccda0b14.png" rel="icon" type="image/png">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+  <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+  <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+  
+
+  
+
+  <!-- start Mixpanel -->
+  <script type="text/javascript">(function(e,a){if(!a.__SV){var b=window;try{var c,l,i,j=b.location,g=j.hash;c=function(a,b){return(l=a.match(RegExp(b+"=([^&]*)")))?l[1]:null};g&&c(g,"state")&&(i=JSON.parse(decodeURIComponent(c(g,"state"))),"mpeditor"===i.action&&(b.sessionStorage.setItem("_mpcehash",g),history.replaceState(i.desiredHash||"",e.title,j.pathname+j.search)))}catch(m){}var k,h;window.mixpanel=a;a._i=[];a.init=function(b,c,f){function e(b,a){var c=a.split(".");2==c.length&&(b=b[c[0]],a=c[1]);b[a]=function(){b.push([a].concat(Array.prototype.slice.call(arguments,
+  0)))}}var d=a;"undefined"!==typeof f?d=a[f]=[]:f="mixpanel";d.people=d.people||[];d.toString=function(b){var a="mixpanel";"mixpanel"!==f&&(a+="."+f);b||(a+=" (stub)");return a};d.people.toString=function(){return d.toString(1)+".people (stub)"};k="disable time_event track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config reset people.set people.set_once people.increment people.append people.union people.track_charge people.clear_charges people.delete_user".split(" ");
+  for(h=0;h<k.length;h++)e(d,k[h]);a._i.push([b,c,f])};a.__SV=1.2;b=e.createElement("script");b.type="text/javascript";b.async=!0;b.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===e.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";c=e.getElementsByTagName("script")[0];c.parentNode.insertBefore(b,c)}})(document,window.mixpanel||[]);
+  mixpanel.init("1919205b2da72e4da3b9b6639b444d59");</script>
+  <!-- end Mixpanel -->
+</head>
+
+<body>
+  <svg style="display: none;">
+    <defs>
+      <symbol id="linkIcon" fill="#706d77" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 0h24v24H0z" fill="none"/>
+          <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+  <label for="nav-trigger" class="navicon-button x">
+    <div class="navicon"></div>
+  </label>
+
+  <label for="nav-trigger" class="overlay"></label>
+
+  <div class="top-nav-wrapper">
+    <ul>
+      <li >
+        <a href="index.html">
+          
+            <svg fill="#6D6D6D" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+              <path d="M0 0h24v24H0z" fill="none"/>
+            </svg>
+          
+          
+        </a>
+      </li>
+
+      
+
+    </ul>
+  </div>
+
+  <nav>
+    <h3 class="reference-title">
+      Braintree SDK Client Reference
+    </h3>
+
+    
+
+    <h3>Classes</h3><ul><li id="BoxGeometry-nav"><a href="BoxGeometry.html">BoxGeometry</a></li><li id="GUIManager-nav"><a href="GUIManager.html">GUIManager</a><ul class='methods'><li data-type="method" id="GUIManager-updateBlur-nav"><a href="GUIManager.html#updateBlur">updateBlur</a></li><li data-type="method" id="GUIManager-updateBlur-nav"><a href="GUIManager.html#updateBlur">updateBlur</a></li><li data-type="method" id="GUIManager-updateFocus-nav"><a href="GUIManager.html#updateFocus">updateFocus</a></li><li data-type="method" id="GUIManager-updateFocus-nav"><a href="GUIManager.html#updateFocus">updateFocus</a></li><li data-type="method" id="GUIManager-updateMaxFocus-nav"><a href="GUIManager.html#updateMaxFocus">updateMaxFocus</a></li><li data-type="method" id="GUIManager-updateMaxFocus-nav"><a href="GUIManager.html#updateMaxFocus">updateMaxFocus</a></li><li data-type="method" id="GUIManager-updateThreshold-nav"><a href="GUIManager.html#updateThreshold">updateThreshold</a></li><li data-type="method" id="GUIManager-updateThreshold-nav"><a href="GUIManager.html#updateThreshold">updateThreshold</a></li><li data-type="method" id="GUIManager-updateTransfer-nav"><a href="GUIManager.html#updateTransfer">updateTransfer</a></li><li data-type="method" id="GUIManager-updateTransfer-nav"><a href="GUIManager.html#updateTransfer">updateTransfer</a></li><li data-type="method" id="GUIManager-updateVolume-nav"><a href="GUIManager.html#updateVolume">updateVolume</a></li><li data-type="method" id="GUIManager-updateVolume-nav"><a href="GUIManager.html#updateVolume">updateVolume</a></li></ul></li><li id="ProxyGeometryGenerator-nav"><a href="ProxyGeometryGenerator.html">ProxyGeometryGenerator</a><ul class='methods'><li data-type="method" id="ProxyGeometryGenerator-calcIntersection-nav"><a href="ProxyGeometryGenerator.html#calcIntersection">calcIntersection</a></li><li data-type="method" id="ProxyGeometryGenerator-calcIntersection-nav"><a href="ProxyGeometryGenerator.html#calcIntersection">calcIntersection</a></li><li data-type="method" id="ProxyGeometryGenerator-setBoundingBox-nav"><a href="ProxyGeometryGenerator.html#setBoundingBox">setBoundingBox</a></li><li data-type="method" id="ProxyGeometryGenerator-setBoundingBox-nav"><a href="ProxyGeometryGenerator.html#setBoundingBox">setBoundingBox</a></li><li data-type="method" id="ProxyGeometryGenerator-sortPolygonEdges-nav"><a href="ProxyGeometryGenerator.html#sortPolygonEdges">sortPolygonEdges</a></li><li data-type="method" id="ProxyGeometryGenerator-sortPolygonEdges-nav"><a href="ProxyGeometryGenerator.html#sortPolygonEdges">sortPolygonEdges</a></li><li data-type="method" id="ProxyGeometryGenerator-updateProxyGeometries-nav"><a href="ProxyGeometryGenerator.html#updateProxyGeometries">updateProxyGeometries</a></li><li data-type="method" id="ProxyGeometryGenerator-updateProxyGeometries-nav"><a href="ProxyGeometryGenerator.html#updateProxyGeometries">updateProxyGeometries</a></li></ul></li><li id="VolumeManager-nav"><a href="VolumeManager.html">VolumeManager</a><ul class='methods'><li data-type="method" id="VolumeManager-loadNRRDFile-nav"><a href="VolumeManager.html#loadNRRDFile">loadNRRDFile</a></li><li data-type="method" id="VolumeManager-loadNRRDFile-nav"><a href="VolumeManager.html#loadNRRDFile">loadNRRDFile</a></li><li data-type="method" id="VolumeManager-updateVolume-nav"><a href="VolumeManager.html#updateVolume">updateVolume</a></li><li data-type="method" id="VolumeManager-updateVolume-nav"><a href="VolumeManager.html#updateVolume">updateVolume</a></li></ul></li></ul><h3 id="global-nav">Global</h3><ul><li><a href="global.html#_axis">_axis</a></li><li><a href="global.html#_box$3">_box$3</a></li><li><a href="global.html#_bufferGeometryId">_bufferGeometryId</a></li><li><a href="global.html#_canvas">_canvas</a></li><li><a href="global.html#_colorKeywords">_colorKeywords</a></li><li><a href="global.html#_context">_context</a></li><li><a href="global.html#_geometry">_geometry</a></li><li><a href="global.html#_geometryId">_geometryId</a></li><li><a href="global.html#_instanceLocalMatrix">_instanceLocalMatrix</a></li><li><a href="global.html#_inverseMatrix">_inverseMatrix</a></li><li><a href="global.html#_inverseMatrix$2">_inverseMatrix$2</a></li><li><a href="global.html#_lut">_lut</a></li><li><a href="global.html#_matrix">_matrix</a></li><li><a href="global.html#_offsetMatrix">_offsetMatrix</a></li><li><a href="global.html#_position$2">_position$2</a></li><li><a href="global.html#_position$3">_position$3</a></li><li><a href="global.html#_RESERVED_CHARS_RE">_RESERVED_CHARS_RE</a></li><li><a href="global.html#_sphere$1">_sphere$1</a></li><li><a href="global.html#_start">_start</a></li><li><a href="global.html#_start$1">_start$1</a></li><li><a href="global.html#_startP">_startP</a></li><li><a href="global.html#_v0$1">_v0$1</a></li><li><a href="global.html#_v1$4">_v1$4</a></li><li><a href="global.html#_v1$5">_v1$5</a></li><li><a href="global.html#_vector">_vector</a></li><li><a href="global.html#_vector1">_vector1</a></li><li><a href="global.html#_vector$3">_vector$3</a></li><li><a href="global.html#_vector$6">_vector$6</a></li><li><a href="global.html#_vector$7">_vector$7</a></li><li><a href="global.html#_vector$8">_vector$8</a></li><li><a href="global.html#_vector$9">_vector$9</a></li><li><a href="global.html#_vector$a">_vector$a</a></li><li><a href="global.html#_vector$b">_vector$b</a></li><li><a href="global.html#absNumericalSort">absNumericalSort</a></li><li><a href="global.html#AmbientLight">AmbientLight</a></li><li><a href="global.html#AmbientLightProbe">AmbientLightProbe</a></li><li><a href="global.html#AnimationAction">AnimationAction</a></li><li><a href="global.html#AnimationClip">AnimationClip</a></li><li><a href="global.html#AnimationLoader">AnimationLoader</a></li><li><a href="global.html#AnimationMixer">AnimationMixer</a></li><li><a href="global.html#AnimationObjectGroup">AnimationObjectGroup</a></li><li><a href="global.html#AnimationUtils">AnimationUtils</a></li><li><a href="global.html#ArrayCamera">ArrayCamera</a></li><li><a href="global.html#arrayMax">arrayMax</a></li><li><a href="global.html#Audio">Audio</a></li><li><a href="global.html#AudioAnalyser">AudioAnalyser</a></li><li><a href="global.html#AudioLoader">AudioLoader</a></li><li><a href="global.html#AxesHelper">AxesHelper</a></li><li><a href="global.html#axis">axis</a></li><li><a href="global.html#Bone">Bone</a></li><li><a href="global.html#BooleanKeyframeTrack">BooleanKeyframeTrack</a></li><li><a href="global.html#Box3">Box3</a></li><li><a href="global.html#Box3Helper">Box3Helper</a></li><li><a href="global.html#BufferGeometryLoader">BufferGeometryLoader</a></li><li><a href="global.html#Cache">Cache</a></li><li><a href="global.html#Camera">Camera</a></li><li><a href="global.html#canvas">canvas</a></li><li><a href="global.html#canvasBuffer">canvasBuffer</a></li><li><a href="global.html#CanvasTexture">CanvasTexture</a></li><li><a href="global.html#CatmullRom">CatmullRom</a></li><li><a href="global.html#CircleGeometry">CircleGeometry</a></li><li><a href="global.html#Clock">Clock</a></li><li><a href="global.html#cloneUniforms">cloneUniforms</a></li><li><a href="global.html#ColorKeyframeTrack">ColorKeyframeTrack</a></li><li><a href="global.html#CompressedTexture">CompressedTexture</a></li><li><a href="global.html#CompressedTextureLoader">CompressedTextureLoader</a></li><li><a href="global.html#ConeGeometry">ConeGeometry</a></li><li><a href="global.html#ctx">ctx</a></li><li><a href="global.html#ctxBuffer">ctxBuffer</a></li><li><a href="global.html#CubeTexture">CubeTexture</a></li><li><a href="global.html#CubeTextureLoader">CubeTextureLoader</a></li><li><a href="global.html#CubicInterpolant">CubicInterpolant</a></li><li><a href="global.html#CylinderGeometry">CylinderGeometry</a></li><li><a href="global.html#Cylindrical">Cylindrical</a></li><li><a href="global.html#data">data</a></li><li><a href="global.html#DataTexture">DataTexture</a></li><li><a href="global.html#DataTexture2DArray">DataTexture2DArray</a></li><li><a href="global.html#DataTexture3D">DataTexture3D</a></li><li><a href="global.html#DataTextureLoader">DataTextureLoader</a></li><li><a href="global.html#DepthTexture">DepthTexture</a></li><li><a href="global.html#DirectGeometry">DirectGeometry</a></li><li><a href="global.html#DirectionalLight">DirectionalLight</a></li><li><a href="global.html#DirectionalLightShadow">DirectionalLightShadow</a></li><li><a href="global.html#DiscreteInterpolant">DiscreteInterpolant</a></li><li><a href="global.html#DodecahedronGeometry">DodecahedronGeometry</a></li><li><a href="global.html#Earcut">Earcut</a></li><li><a href="global.html#EdgesGeometry">EdgesGeometry</a></li><li><a href="global.html#emptyTexture">emptyTexture</a></li><li><a href="global.html#EventDispatcher">EventDispatcher</a></li><li><a href="global.html#ExtrudeGeometry">ExtrudeGeometry</a></li><li><a href="global.html#Face3">Face3</a></li><li><a href="global.html#Face4">Face4</a></li><li><a href="global.html#Fog">Fog</a></li><li><a href="global.html#FogExp2">FogExp2</a></li><li><a href="global.html#Font">Font</a></li><li><a href="global.html#FontLoader">FontLoader</a></li><li><a href="global.html#fov">fov</a></li><li><a href="global.html#geometryNeedsUpdate">geometryNeedsUpdate</a></li><li><a href="global.html#getFocalLength">getFocalLength</a></li><li><a href="global.html#GridHelper">GridHelper</a></li><li><a href="global.html#Group">Group</a></li><li><a href="global.html#HemisphereLight">HemisphereLight</a></li><li><a href="global.html#HemisphereLightProbe">HemisphereLightProbe</a></li><li><a href="global.html#IcosahedronGeometry">IcosahedronGeometry</a></li><li><a href="global.html#ImageBitmapLoader">ImageBitmapLoader</a></li><li><a href="global.html#ImageLoader">ImageLoader</a></li><li><a href="global.html#ImmediateRenderObject">ImmediateRenderObject</a></li><li><a href="global.html#index">index</a></li><li><a href="global.html#InstancedBufferAttribute">InstancedBufferAttribute</a></li><li><a href="global.html#InstancedBufferGeometry">InstancedBufferGeometry</a></li><li><a href="global.html#InstancedInterleavedBuffer">InstancedInterleavedBuffer</a></li><li><a href="global.html#InterleavedBuffer">InterleavedBuffer</a></li><li><a href="global.html#Interpolant">Interpolant</a></li><li><a href="global.html#inverseMatrix">inverseMatrix</a></li><li><a href="global.html#KeyframeTrack">KeyframeTrack</a></li><li><a href="global.html#LatheGeometry">LatheGeometry</a></li><li><a href="global.html#Layers">Layers</a></li><li><a href="global.html#Light">Light</a></li><li><a href="global.html#LightProbe">LightProbe</a></li><li><a href="global.html#LightShadow">LightShadow</a></li><li><a href="global.html#LinearInterpolant">LinearInterpolant</a></li><li><a href="global.html#LineBasicMaterial">LineBasicMaterial</a></li><li><a href="global.html#LineDashedMaterial">LineDashedMaterial</a></li><li><a href="global.html#LineLoop">LineLoop</a></li><li><a href="global.html#Loader">Loader</a></li><li><a href="global.html#LoaderUtils">LoaderUtils</a></li><li><a href="global.html#loading">loading</a></li><li><a href="global.html#LoadingManager">LoadingManager</a></li><li><a href="global.html#LOD_MIN">LOD_MIN</a></li><li><a href="global.html#lowerThreshold">lowerThreshold</a></li><li><a href="global.html#materialId">materialId</a></li><li><a href="global.html#MaterialLoader">MaterialLoader</a></li><li><a href="global.html#matrix">matrix</a></li><li><a href="global.html#Matrix3">Matrix3</a></li><li><a href="global.html#Matrix4">Matrix4</a></li><li><a href="global.html#mesh">mesh</a></li><li><a href="global.html#MeshBasicMaterial">MeshBasicMaterial</a></li><li><a href="global.html#MeshDepthMaterial">MeshDepthMaterial</a></li><li><a href="global.html#MeshDistanceMaterial">MeshDistanceMaterial</a></li><li><a href="global.html#MeshLambertMaterial">MeshLambertMaterial</a></li><li><a href="global.html#MeshMatcapMaterial">MeshMatcapMaterial</a></li><li><a href="global.html#MeshNormalMaterial">MeshNormalMaterial</a></li><li><a href="global.html#MeshPhongMaterial">MeshPhongMaterial</a></li><li><a href="global.html#MeshPhysicalMaterial">MeshPhysicalMaterial</a></li><li><a href="global.html#MeshStandardMaterial">MeshStandardMaterial</a></li><li><a href="global.html#MeshToonMaterial">MeshToonMaterial</a></li><li><a href="global.html#NumberKeyframeTrack">NumberKeyframeTrack</a></li><li><a href="global.html#Object3D">Object3D</a></li><li><a href="global.html#ObjectLoader">ObjectLoader</a></li><li><a href="global.html#OctahedronGeometry">OctahedronGeometry</a></li><li><a href="global.html#offset">offset</a></li><li><a href="global.html#OrthographicCamera">OrthographicCamera</a></li><li><a href="global.html#painterSortStable">painterSortStable</a></li><li><a href="global.html#ParametricGeometry">ParametricGeometry</a></li><li><a href="global.html#Path">Path</a></li><li><a href="global.html#PerspectiveCamera">PerspectiveCamera</a></li><li><a href="global.html#PlaneGeometry">PlaneGeometry</a></li><li><a href="global.html#PlaneHelper">PlaneHelper</a></li><li><a href="global.html#PointLight">PointLight</a></li><li><a href="global.html#PointLightHelper">PointLightHelper</a></li><li><a href="global.html#PointsMaterial">PointsMaterial</a></li><li><a href="global.html#PolarGridHelper">PolarGridHelper</a></li><li><a href="global.html#PolyhedronGeometry">PolyhedronGeometry</a></li><li><a href="global.html#programIdCount">programIdCount</a></li><li><a href="global.html#PropertyMixer">PropertyMixer</a></li><li><a href="global.html#Quaternion">Quaternion</a></li><li><a href="global.html#QuaternionKeyframeTrack">QuaternionKeyframeTrack</a></li><li><a href="global.html#QuaternionLinearInterpolant">QuaternionLinearInterpolant</a></li><li><a href="global.html#RawShaderMaterial">RawShaderMaterial</a></li><li><a href="global.html#Ray">Ray</a></li><li><a href="global.html#Raycaster">Raycaster</a></li><li><a href="global.html#RectAreaLight">RectAreaLight</a></li><li><a href="global.html#RingGeometry">RingGeometry</a></li><li><a href="global.html#sanitizeNodeName">sanitizeNodeName</a></li><li><a href="global.html#Scene">Scene</a></li><li><a href="global.html#setFocalLength">setFocalLength</a></li><li><a href="global.html#setViewOffset">setViewOffset</a></li><li><a href="global.html#ShaderLib">ShaderLib</a></li><li><a href="global.html#ShaderMaterial">ShaderMaterial</a></li><li><a href="global.html#ShadowMaterial">ShadowMaterial</a></li><li><a href="global.html#Shape">Shape</a></li><li><a href="global.html#ShapeGeometry">ShapeGeometry</a></li><li><a href="global.html#ShapePath">ShapePath</a></li><li><a href="global.html#ShapeUtils">ShapeUtils</a></li><li><a href="global.html#SkinnedMesh">SkinnedMesh</a></li><li><a href="global.html#sliceList">sliceList</a></li><li><a href="global.html#spacing">spacing</a></li><li><a href="global.html#Sphere">Sphere</a></li><li><a href="global.html#SphereGeometry">SphereGeometry</a></li><li><a href="global.html#Spherical">Spherical</a></li><li><a href="global.html#SphericalHarmonics3">SphericalHarmonics3</a></li><li><a href="global.html#SpotLight">SpotLight</a></li><li><a href="global.html#SpotLightShadow">SpotLightShadow</a></li><li><a href="global.html#SpriteMaterial">SpriteMaterial</a></li><li><a href="global.html#StereoCamera">StereoCamera</a></li><li><a href="global.html#StringKeyframeTrack">StringKeyframeTrack</a></li><li><a href="global.html#TetrahedronGeometry">TetrahedronGeometry</a></li><li><a href="global.html#TextGeometry">TextGeometry</a></li><li><a href="global.html#textureId">textureId</a></li><li><a href="global.html#TextureLoader">TextureLoader</a></li><li><a href="global.html#TorusGeometry">TorusGeometry</a></li><li><a href="global.html#TorusKnotGeometry">TorusKnotGeometry</a></li><li><a href="global.html#TubeGeometry">TubeGeometry</a></li><li><a href="global.html#Uniform">Uniform</a></li><li><a href="global.html#UniformsCache">UniformsCache</a></li><li><a href="global.html#UniformsLib">UniformsLib</a></li><li><a href="global.html#upperThreshold">upperThreshold</a></li><li><a href="global.html#Vector2">Vector2</a></li><li><a href="global.html#Vector4">Vector4</a></li><li><a href="global.html#VectorKeyframeTrack">VectorKeyframeTrack</a></li><li><a href="global.html#VideoTexture">VideoTexture</a></li><li><a href="global.html#volume">volume</a></li><li><a href="global.html#WebGLAnimation">WebGLAnimation</a></li><li><a href="global.html#WebGLAttributes">WebGLAttributes</a></li><li><a href="global.html#WebGLBackground">WebGLBackground</a></li><li><a href="global.html#WebGLBufferRenderer">WebGLBufferRenderer</a></li><li><a href="global.html#WebGLCapabilities">WebGLCapabilities</a></li><li><a href="global.html#WebGLClipping">WebGLClipping</a></li><li><a href="global.html#WebGLCubeRenderTarget">WebGLCubeRenderTarget</a></li><li><a href="global.html#WebGLExtensions">WebGLExtensions</a></li><li><a href="global.html#WebGLGeometries">WebGLGeometries</a></li><li><a href="global.html#WebGLIndexedBufferRenderer">WebGLIndexedBufferRenderer</a></li><li><a href="global.html#WebGLInfo">WebGLInfo</a></li><li><a href="global.html#WebGLMultisampleRenderTarget">WebGLMultisampleRenderTarget</a></li><li><a href="global.html#WebGLObjects">WebGLObjects</a></li><li><a href="global.html#WebGLPrograms">WebGLPrograms</a></li><li><a href="global.html#WebGLProperties">WebGLProperties</a></li><li><a href="global.html#WebGLRenderer">WebGLRenderer</a></li><li><a href="global.html#WebGLRenderState">WebGLRenderState</a></li><li><a href="global.html#WebGLShader">WebGLShader</a></li><li><a href="global.html#WebGLShadowMap">WebGLShadowMap</a></li><li><a href="global.html#WebGLState">WebGLState</a></li><li><a href="global.html#WebGLTextures">WebGLTextures</a></li><li><a href="global.html#WebGLUtils">WebGLUtils</a></li><li><a href="global.html#WebXRManager">WebXRManager</a></li><li><a href="global.html#WireframeGeometry">WireframeGeometry</a></li><li><a href="global.html#xLength">xLength</a></li><li><a href="global.html#yLength">yLength</a></li><li><a href="global.html#zLength">zLength</a></li></ul>
+  </nav>
+
+  <div id="main">
+    
+      <h1 class="page-title">
+        js/misc/VolumeSlice.js
+      </h1>
+    
+
+    
+      
+
+<section>
+  <article>
+    <pre class="prettyprint source linenums"><code>/**
+ * This class has been made to hold a slice of a volume data
+ * @class
+ * @author Valentin Demeusy / https://github.com/stity
+ * @param   {Volume} volume    The associated volume
+ * @param   {number}       [index=0] The index of the slice
+ * @param   {string}       [axis='z']      For now only 'x', 'y' or 'z' but later it will change to a normal vector
+ * @see Volume
+ */
+
+import {
+	ClampToEdgeWrapping,
+	DoubleSide,
+	LinearFilter,
+	Mesh,
+	MeshBasicMaterial,
+	PlaneBufferGeometry,
+	Texture
+} from "../../build/three.module.js";
+var VolumeSlice = function ( volume, index, axis ) {
+
+	var slice = this;
+	/**
+	 * @member {Volume} volume The associated volume
+	 */
+	this.volume = volume;
+	/**
+	 * @member {Number} index The index of the slice, if changed, will automatically call updateGeometry at the next repaint
+	 */
+	index = index || 0;
+	Object.defineProperty( this, 'index', {
+		get: function () {
+
+			return index;
+
+		},
+		set: function ( value ) {
+
+			index = value;
+			slice.geometryNeedsUpdate = true;
+			return index;
+
+		}
+	} );
+	/**
+	 * @member {String} axis The normal axis
+	 */
+	this.axis = axis || 'z';
+
+	/**
+	 * @member {HTMLCanvasElement} canvas The final canvas used for the texture
+	 */
+	/**
+	 * @member {CanvasRenderingContext2D} ctx Context of the canvas
+	 */
+	this.canvas = document.createElement( 'canvas' );
+	/**
+	 * @member {HTMLCanvasElement} canvasBuffer The intermediary canvas used to paint the data
+	 */
+	/**
+	 * @member {CanvasRenderingContext2D} ctxBuffer Context of the canvas buffer
+	 */
+	this.canvasBuffer = document.createElement( 'canvas' );
+	this.updateGeometry();
+
+
+	var canvasMap = new Texture( this.canvas );
+	canvasMap.minFilter = LinearFilter;
+	canvasMap.wrapS = canvasMap.wrapT = ClampToEdgeWrapping;
+	var material = new MeshBasicMaterial( { map: canvasMap, side: DoubleSide, transparent: true } );
+	/**
+	 * @member {Mesh} mesh The mesh ready to get used in the scene
+	 */
+	this.mesh = new Mesh( this.geometry, material );
+	this.mesh.matrixAutoUpdate = false;
+	/**
+	 * @member {Boolean} geometryNeedsUpdate If set to true, updateGeometry will be triggered at the next repaint
+	 */
+	this.geometryNeedsUpdate = true;
+	this.repaint();
+
+	/**
+	 * @member {Number} iLength Width of slice in the original coordinate system, corresponds to the width of the buffer canvas
+	 */
+
+	/**
+	 * @member {Number} jLength Height of slice in the original coordinate system, corresponds to the height of the buffer canvas
+	 */
+
+	/**
+	 * @member {Function} sliceAccess Function that allow the slice to access right data
+	 * @see Volume.extractPerpendicularPlane
+	 * @param {Number} i The first coordinate
+	 * @param {Number} j The second coordinate
+	 * @returns {Number} the index corresponding to the voxel in volume.data of the given position in the slice
+	 */
+
+
+};
+
+VolumeSlice.prototype = {
+
+	constructor: VolumeSlice,
+
+	/**
+	 * @member {Function} repaint Refresh the texture and the geometry if geometryNeedsUpdate is set to true
+	 * @memberof VolumeSlice
+	 */
+	repaint: function () {
+
+		if ( this.geometryNeedsUpdate ) {
+
+			this.updateGeometry();
+
+		}
+
+		var iLength = this.iLength,
+			jLength = this.jLength,
+			sliceAccess = this.sliceAccess,
+			volume = this.volume,
+			canvas = this.canvasBuffer,
+			ctx = this.ctxBuffer;
+
+
+		// get the imageData and pixel array from the canvas
+		var imgData = ctx.getImageData( 0, 0, iLength, jLength );
+		var data = imgData.data;
+		var volumeData = volume.data;
+		var upperThreshold = volume.upperThreshold;
+		var lowerThreshold = volume.lowerThreshold;
+		var windowLow = volume.windowLow;
+		var windowHigh = volume.windowHigh;
+
+		// manipulate some pixel elements
+		var pixelCount = 0;
+
+		if ( volume.dataType === 'label' ) {
+
+			//this part is currently useless but will be used when colortables will be handled
+			for ( var j = 0; j &lt; jLength; j ++ ) {
+
+				for ( var i = 0; i &lt; iLength; i ++ ) {
+
+					var label = volumeData[ sliceAccess( i, j ) ];
+					label = label >= this.colorMap.length ? ( label % this.colorMap.length ) + 1 : label;
+					var color = this.colorMap[ label ];
+					data[ 4 * pixelCount ] = ( color >> 24 ) &amp; 0xff;
+					data[ 4 * pixelCount + 1 ] = ( color >> 16 ) &amp; 0xff;
+					data[ 4 * pixelCount + 2 ] = ( color >> 8 ) &amp; 0xff;
+					data[ 4 * pixelCount + 3 ] = color &amp; 0xff;
+					pixelCount ++;
+
+				}
+
+			}
+
+		} else {
+
+			for ( var j = 0; j &lt; jLength; j ++ ) {
+
+				for ( var i = 0; i &lt; iLength; i ++ ) {
+
+					var value = volumeData[ sliceAccess( i, j ) ];
+					var alpha = 0xff;
+					//apply threshold
+					alpha = upperThreshold >= value ? ( lowerThreshold &lt;= value ? alpha : 0 ) : 0;
+					//apply window level
+					value = Math.floor( 255 * ( value - windowLow ) / ( windowHigh - windowLow ) );
+					value = value > 255 ? 255 : ( value &lt; 0 ? 0 : value | 0 );
+
+					data[ 4 * pixelCount ] = value;
+					data[ 4 * pixelCount + 1 ] = value;
+					data[ 4 * pixelCount + 2 ] = value;
+					data[ 4 * pixelCount + 3 ] = alpha;
+					pixelCount ++;
+
+				}
+
+			}
+
+		}
+		ctx.putImageData( imgData, 0, 0 );
+		this.ctx.drawImage( canvas, 0, 0, iLength, jLength, 0, 0, this.canvas.width, this.canvas.height );
+
+
+		this.mesh.material.map.needsUpdate = true;
+
+	},
+
+	/**
+	 * @member {Function} Refresh the geometry according to axis and index
+	 * @see Volume.extractPerpendicularPlane
+	 * @memberof VolumeSlice
+	 */
+	updateGeometry: function () {
+
+		var extracted = this.volume.extractPerpendicularPlane( this.axis, this.index );
+		this.sliceAccess = extracted.sliceAccess;
+		this.jLength = extracted.jLength;
+		this.iLength = extracted.iLength;
+		this.matrix = extracted.matrix;
+
+		this.canvas.width = extracted.planeWidth;
+		this.canvas.height = extracted.planeHeight;
+		this.canvasBuffer.width = this.iLength;
+		this.canvasBuffer.height = this.jLength;
+		this.ctx = this.canvas.getContext( '2d' );
+		this.ctxBuffer = this.canvasBuffer.getContext( '2d' );
+
+		if ( this.geometry ) this.geometry.dispose(); // dispose existing geometry
+
+		this.geometry = new PlaneBufferGeometry( extracted.planeWidth, extracted.planeHeight );
+
+		if ( this.mesh ) {
+
+			this.mesh.geometry = this.geometry;
+			//reset mesh matrix
+			this.mesh.matrix.identity();
+			this.mesh.applyMatrix4( this.matrix );
+
+		}
+
+		this.geometryNeedsUpdate = false;
+
+	}
+
+};
+
+export { VolumeSlice };
+</code></pre>
+  </article>
+</section>
+
+    
+
+
+  </div>
+
+  <br class="clear">
+
+  <footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a>
+  </footer>
+
+  <script src="scripts/linenumber.js"></script>
+  <script src="scripts/pagelocation.js"></script>
+
+  
+
+</body>
+</html>
