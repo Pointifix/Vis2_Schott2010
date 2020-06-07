@@ -53,6 +53,10 @@
     init();
     animate();
 
+	/**
+	 * @description Initialize renderer, 3D loader....
+	 */
+
     function init() {
         //Scenes
         for (let i = 0; i < SHARED.MAX_SLICES_COUNT; i++) {
@@ -170,6 +174,9 @@
         window.addEventListener('resize', onWindowResize, false);
     }
 
+	/**
+	 * @description If the user resized the window, change framebuffer/camera
+	 */
     function onWindowResize() {
         renderer.setSize(window.innerWidth, window.innerHeight);
         let aspect = window.innerWidth / window.innerHeight;
@@ -194,6 +201,7 @@
         camera.updateProjectionMatrix();
     }
 
+
     function animate() {
         requestAnimationFrame(animate);
 
@@ -213,6 +221,9 @@
         }
     }
 
+	/**
+	 * @description Render front2back and back2front, draw scene
+	 */
     function render() {
         renderer.setRenderTarget(b2fRenderTargets[b2fCurrentRenderTarget | 0]);
         renderer.clear();

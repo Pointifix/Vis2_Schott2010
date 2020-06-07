@@ -56,26 +56,47 @@ class GUIManager {
         return this;
     }
 
+    /**
+     * @param {string} value
+     * @description If user changed 3D-Volume, load the new Volume.
+     */
     updateVolume(value) {
         this.volumeManager.loadNRRDFile("./misc/models/nrrd/" + value + ".nrrd", value, this);
         this.update = true;
     }
 
+    /**
+     * @param {number} value
+     * @description update transfer-value.
+     */
     updateTransfer(value) {
         this.transfer = value;
         this.update = true;
     }
 
+    /**
+     * @param {number} value
+     * @description update blue-value.
+     */
     updateBlur(value) {
        this.blur = value;
        this.update = true;
     }
 
+    /**
+     * @param {number} value
+     * @description Update distance of focal plane.
+     */
     updateFocus(value) {
         window.focal_plane_distance = value;
         this.update = true;
     }
 
+
+    /**
+     * @param {number} maxValue
+     * @description Set maxValue for focalplane slider and default value to the half of max-value
+     */
     updateMaxFocus(maxValue) {
         this.gui.__controllers.forEach(controller => {
             if (controller.property === "Focus") {
@@ -86,6 +107,10 @@ class GUIManager {
         });
     }
 
+    /**
+     * @param {number} value
+     * @description Update threshold.
+     */
     updateThreshold(value) {
         this.threshold = value;
         this.update = true;

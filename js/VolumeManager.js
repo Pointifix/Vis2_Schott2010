@@ -40,6 +40,12 @@ class VolumeManager {
         return this;
     }
 
+    /**
+     * @param {String} filePath
+     * @param {String} file
+     * @param guiManager
+     * @description Load new 3D-Volume
+     */
     loadNRRDFile(filePath, file, guiManager) {
         this.currentFileName = file;
 
@@ -50,6 +56,11 @@ class VolumeManager {
         this.NRRDLoader.load(filePath, callBackFunction);
     }
 
+    /**
+     * @param  volume
+     * @param guiManager
+     * @description  update the volume
+     */
     updateVolume(volume,guiManager) {
         this.volume = volume;
 

@@ -31,8 +31,8 @@ class ProxyGeometryGenerator {
     }
 
     /**
-     * Updates the bounding box
-     * @param box
+     * @param  box
+     * @description Update bounding box.
      */
     setBoundingBox(box) {
         this.box = box;
@@ -149,8 +149,9 @@ class ProxyGeometryGenerator {
         this.sliceIndex = sliceIndex;
     }
 
+
     /**
-     * Calculates the centroid of intersectionVertices, sorts the intersection Vertices according in ascending order of the angle
+     * @description  Calculates the centroid of intersectionVertices, sorts the intersection Vertices according in ascending order of the angle
      * to the centroid, and adds the centroid at the end of intersectionVertices
      * @param intersectionVertices
      */
