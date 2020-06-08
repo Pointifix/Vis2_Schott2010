@@ -12,6 +12,7 @@
     "templates": {
         "cleverLinks": false,
         "monospaceLinks": true,
+        "referenceTitle": "Depth of Field Effects for Interactive Direct Volume Rendering",
         "systemName": "Depth of Field Effects for Interactive Direct Volume Rendering",
         "footer": "David Ammer, Simon Pointner",
         "copyright": "2020",
