@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Depth of Field Effects for Interactive Direct Volume Rendering</title>
+</head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+<style>
+    * {
+        font-family: Arial, monospace;
+    }
+
+    img {
+        width: 100%;
+    }
+
+    .content {
+        max-width: 1000px;
+        margin: auto;
+        padding: 10px;
+    }
+</style>
+
+<body>
+<div class="content">
+    <h2>Depth of Field Effects for Interactive Direct Volume Rendering</h2>
+
+    <p><a class="mr-3" href="../js">Source</a> <a class="mr-3" href="../docs/js/index.html">Documentation</a> </p>
+    <hr>
+
+    <div class="d-flex">
+        <figure class="figure w-50 mx-auto d-block">
+            <img class="figure-img img-fluid rounded-left" src="img/skull_dof.png"
+                 alt="Skull with DOF">
+            <figcaption class="figure-caption text-center">Figure 1. DOF on</figcaption>
+        </figure>
+        <figure class="figure w-50 mx-auto d-block">
+            <img class="figure-img img-fluid rounded-right" src="img/skull.png"
+                 alt="Skull without DOF">
+            <figcaption class="figure-caption text-center">Figure 2. DOF off</figcaption>
+        </figure>
+    </div>
+
+    <hr>
+    <h2>Idea and Implementation</h2>
+
+    <p>
+        The technical report of <a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.185.734&rep=rep1&type=pdf">Schott et al.</a> describes how they implemented a depth-of-field
+        (DOF) effect for direct volume rendering. They describe DOF as the area of an image that is
+        in focus. The motivation for implementing DOF they state is that the human visual system
+        uses DOF to aid inferring absolute distances.
+        DOF can be computed in a <a href="https://developer.download.nvidia.com/books/HTML/gpugems/gpugems_ch39.html">slice-based volume renderer</a> system by modifying the traversal
+        of the slices and the composition of a slice-based volume renderer, which renders proxy
+        geometry. Those proxy geometry, also called view-aligned slices, are divided into two parts (Figure 3) .
+        The first part are the slices in front of the focal plane (Front to Back) and the other
+        slices are behind the focal plane (Back to Front). The results of both traversals are written
+        into separate buffers and blended together afterwards. The traversing for DOF in
+        comparison to normal volume rendering is done by averaging samples around the current
+        fragment, which are taken in a regular grid. Depending on the distance to the focal plane the
+        radius of confusion increases, therefore more samples are averaged.
+    </p>
+
+    <figure class="figure w-50 mx-auto d-block">
+        <img class="figure-img img-fluid rounded" src="img/f2bb2f.png"
+             alt="Visualisation of the geometric setup of computing depth of field effects">
+        <figcaption class="figure-caption text-center">Figure 3: Visualisation of the geometric setup of computing depth of field effects</figcaption>
+    </figure>
+
+    <hr>
+    <h2>Technology</h2>
+    <p>
+        We implemented the visualization with HTML, CSS and Javascript. Further we used Webgl in combination with the Three.js
+        library for the rendering. For loading volume data in the NRRD file format, we used sample code from a THREE.js volume rendering sample.
+    </p>
+    <p>
+        <a href="https://developer.mozilla.org/de/docs/Web/API/WebGL_API">https://developer.mozilla.org/de/docs/Web/API/WebGL_API</a><br>
+        <a href="https://threejs.org/">https://threejs.org/</a><br>
+        <a href="https://threejs.org/examples/webgl2_materials_texture3d.html">https://threejs.org/examples/webgl2_materials_texture3d.html</a>
+    </p>
+
+    <hr>
+    <h2>Documentation</h2>
+    <p>
+        We used <a href="https://github.com/jsdoc/jsdoc">JSDoc</a> to create the documentation.
+
+        The UI allows customization of the dataset and transfer function used, as well as focal plane distance, the strength of the
+        DOF effect and the ISO-threshold.
+    </p>
+
+    <hr>
+    <h2>Dataset</h2>
+    <p>
+        The web application includes 6 different open <a href="https://klacansky.com/open-scivis-datasets/">scientific volume datasets</a>.<br>
+        Datasets: Aneurism, Stent, Skull, Engine, Boston Teapot and Lobster
+    </p>
+
+</div>
+</body>
+</html>
