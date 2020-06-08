@@ -21,14 +21,14 @@ class GUIManager {
 
         this.volumeManager = new VolumeManager(null, null, null);
         this.focus = 120;
-        this.blur = 0.5;
+        this.blur = 0.0;
         this.threshold = 0.15;
         this.transfer = 'gray';
 
         this.gui = new GUI();
 
         let volumeParams = {
-            Volume: 'Skull',
+            Volume: 'Stent',
             Transfer: this.transfer,
             Focus: this.focus,
             Blur: this.blur,
